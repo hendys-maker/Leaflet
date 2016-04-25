@@ -250,7 +250,8 @@ L.Marker = L.Class.extend({
 
 		if (wasDragged) { return; }
 
-		if ((!this.dragging || !this.dragging._enabled) && this._map.dragging && this._map.dragging.moved()) { return; }
+		if ((!this.dragging || !this.dragging._enabled) && this._map &&
+					this._map.dragging && this._map.dragging.moved()) { return; }
 
 		this.fire(e.type, {
 			originalEvent: e,
