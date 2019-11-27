@@ -93,7 +93,11 @@ L.Map.TouchZoom = L.Handler.extend({
 		var moveFn = L.bind(map._move, map, this._center, this._zoom, {pinch: true, round: false});
 		this._animRequest = L.Util.requestAnimFrame(moveFn, this, true);
 
+<<<<<<< HEAD
 		L.DomEvent.preventDefault(e);
+=======
+		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
+>>>>>>> origin/0.7.8
 	},
 
 	_onTouchEnd: function () {

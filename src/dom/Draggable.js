@@ -120,7 +120,11 @@ L.Draggable = L.Evented.extend({
 		    offset = newPoint.subtract(this._startPoint);
 
 		if (!offset.x && !offset.y) { return; }
+<<<<<<< HEAD
 		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) { return; }
+=======
+		if (L.Browser.touch && Math.abs(offset.x) + Math.abs(offset.y) < 3) { return; }
+>>>>>>> origin/0.7.8
 
 		L.DomEvent.preventDefault(e);
 
@@ -133,6 +137,7 @@ L.Draggable = L.Evented.extend({
 			this._startPos = L.DomUtil.getPosition(this._element).subtract(offset);
 
 			L.DomUtil.addClass(document.body, 'leaflet-dragging');
+<<<<<<< HEAD
 
 			this._lastTarget = e.target || e.srcElement;
 			// IE and Edge do not give the <use> element, so fetch it
@@ -140,6 +145,9 @@ L.Draggable = L.Evented.extend({
 			if ((window.SVGElementInstance) && (this._lastTarget instanceof SVGElementInstance)) {
 				this._lastTarget = this._lastTarget.correspondingUseElement;
 			}
+=======
+			this._lastTarget = e.target || e.srcElement;
+>>>>>>> origin/0.7.8
 			L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
 		}
 
@@ -165,12 +173,16 @@ L.Draggable = L.Evented.extend({
 		this.fire('drag', e);
 	},
 
+<<<<<<< HEAD
 	_onUp: function (e) {
 		// Ignore simulated events, since we handle both touch and
 		// mouse explicitly; otherwise we risk getting duplicates of
 		// touch events, see #4315.
 		if (e._simulated) { return; }
 
+=======
+	_onUp: function () {
+>>>>>>> origin/0.7.8
 		L.DomUtil.removeClass(document.body, 'leaflet-dragging');
 
 		if (this._lastTarget) {

@@ -6,6 +6,7 @@ var L = {
 function expose() {
 	var oldL = window.L;
 
+<<<<<<< HEAD
 	L.noConflict = function () {
 		window.L = oldL;
 		return this;
@@ -13,6 +14,9 @@ function expose() {
 
 	window.L = L;
 }
+=======
+L.version = '0.7.7';
+>>>>>>> origin/0.7.8
 
 // define Leaflet for Node module pattern loaders, including Browserify
 if (typeof module === 'object' && typeof module.exports === 'object') {

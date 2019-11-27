@@ -14,5 +14,9 @@ coverage/
 index.html
 .mailmap
 bower.json
+<<<<<<< HEAD
 component.json
 debug/local/
+=======
+component.json
+>>>>>>> origin/0.7.8

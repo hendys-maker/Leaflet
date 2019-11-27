@@ -233,5 +233,9 @@ exports.test = function(complete, fail) {
 			process.exit(exitCode);
 		}
 	});
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/0.7.8
 	server.start();
 };

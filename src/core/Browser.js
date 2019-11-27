@@ -26,13 +26,24 @@
 	    chrome    = ua.indexOf('chrome') !== -1,
 	    gecko     = ua.indexOf('gecko') !== -1  && !webkit && !window.opera && !ie,
 
+<<<<<<< HEAD
 	    mobile = typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1,
 	    msPointer = !window.PointerEvent && window.MSPointerEvent,
 	    pointer = window.PointerEvent || msPointer,
+=======
+	    mobile = typeof orientation !== undefined + '',
+	    msPointer = !window.PointerEvent && window.MSPointerEvent,
+		pointer = (window.PointerEvent && window.navigator.pointerEnabled) ||
+				  msPointer,
+	    retina = ('devicePixelRatio' in window && window.devicePixelRatio > 1) ||
+	             ('matchMedia' in window && window.matchMedia('(min-resolution:144dpi)') &&
+	              window.matchMedia('(min-resolution:144dpi)').matches),
+>>>>>>> origin/0.7.8
 
 	    ie3d = ie && ('transition' in doc.style),
 	    webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23,
 	    gecko3d = 'MozPerspective' in doc.style,
+<<<<<<< HEAD
 	    opera12 = 'OTransition' in doc.style;
 
 	var touch = !window.L_NO_TOUCH && (pointer || 'ontouchstart' in window ||
@@ -59,6 +70,13 @@
 		// @property gecko: Boolean
 		// `true` for gecko-based browsers like Firefox.
 		gecko: gecko,
+=======
+	    opera3d = 'OTransition' in doc.style,
+	    any3d = !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d) && !phantomjs;
+
+	var touch = !window.L_NO_TOUCH && !phantomjs && (pointer || 'ontouchstart' in window ||
+		(window.DocumentTouch && document instanceof window.DocumentTouch));
+>>>>>>> origin/0.7.8
 
 		// @property android: Boolean
 		// `true` for any browser running on an Android platform.

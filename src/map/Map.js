@@ -195,7 +195,11 @@ L.Map = L.Evented.extend({
 
 		    zoom = this.getBoundsZoom(bounds, false, paddingTL.add(paddingBR));
 
+<<<<<<< HEAD
 		zoom = (typeof options.maxZoom === 'number') ? Math.min(options.maxZoom, zoom) : zoom;
+=======
+		zoom = (options.maxZoom) ? Math.min(options.maxZoom, zoom) : zoom;
+>>>>>>> origin/0.7.8
 
 		var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
 
@@ -203,6 +207,7 @@ L.Map = L.Evented.extend({
 		    nePoint = this.project(bounds.getNorthEast(), zoom),
 		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom);
 
+<<<<<<< HEAD
 		return {
 			center: center,
 			zoom: zoom
@@ -222,6 +227,9 @@ L.Map = L.Evented.extend({
 
 		var target = this._getBoundsCenterZoom(bounds, options);
 		return this.setView(target.center, target.zoom, options);
+=======
+		return this.setView(center, zoom, options);
+>>>>>>> origin/0.7.8
 	},
 
 	// @method fitWorld(options?: fitBounds options): this
@@ -851,6 +859,7 @@ L.Map = L.Evented.extend({
 		return this.fire('move', data);
 	},
 
+<<<<<<< HEAD
 	_moveEnd: function (zoomChanged) {
 		// @event zoomend: Event
 		// Fired when the map has changed, after any animations.
@@ -863,6 +872,16 @@ L.Map = L.Evented.extend({
 		// dragging the map).
 		return this.fire('moveend');
 	},
+=======
+		this.fire('viewreset', {hard: !preserveMapOffset});
+
+		if (loading) {
+			this.fire('load');
+			this.eachLayer(this._layerAdd, this);
+		}
+
+		this.fire('move');
+>>>>>>> origin/0.7.8
 
 	_stop: function () {
 		L.Util.cancelAnimFrame(this._flyToFrame);

@@ -37,7 +37,13 @@ L.FeatureGroup = L.LayerGroup.extend({
 			layer = this._layers[layer];
 		}
 
+<<<<<<< HEAD
 		layer.removeEventParent(this);
+=======
+		if ('off' in layer) {
+			layer.off(L.FeatureGroup.EVENTS, this._propagateEvent, this);
+		}
+>>>>>>> origin/0.7.8
 
 		L.LayerGroup.prototype.removeLayer.call(this, layer);
 

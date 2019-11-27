@@ -96,9 +96,17 @@ L.Map.include(!zoomAnimated ? {} : {
 		return true;
 	},
 
+<<<<<<< HEAD
 	_animateZoom: function (center, zoom, startAnim, noUpdate) {
 		if (startAnim) {
 			this._animatingZoom = true;
+=======
+	_animateZoom: function (center, zoom, origin, scale, delta, backwards, forTouchZoom) {
+
+		if (!forTouchZoom) {
+			this._animatingZoom = true;
+		}
+>>>>>>> origin/0.7.8
 
 			// remember what center/zoom to set after animation
 			this._animateToCenter = center;
@@ -107,6 +115,7 @@ L.Map.include(!zoomAnimated ? {} : {
 			L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
 		}
 
+<<<<<<< HEAD
 		// @event zoomanim: ZoomAnimEvent
 		// Fired on every frame of a zoom animation
 		this.fire('zoomanim', {
@@ -117,10 +126,25 @@ L.Map.include(!zoomAnimated ? {} : {
 
 		// Work around webkit not firing 'transitionend', see https://github.com/Leaflet/Leaflet/issues/3689, 2693
 		setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
+=======
+		L.Util.requestAnimFrame(function () {
+			this.fire('zoomanim', {
+				center: center,
+				zoom: zoom,
+				origin: origin,
+				scale: scale,
+				delta: delta,
+				backwards: backwards
+			});
+			// horrible hack to work around a Chrome bug https://github.com/Leaflet/Leaflet/issues/3689
+			setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
+		}, this);
+>>>>>>> origin/0.7.8
 	},
 
 	_onZoomTransitionEnd: function () {
 		if (!this._animatingZoom) { return; }
+<<<<<<< HEAD
 
 		L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
 
@@ -131,6 +155,19 @@ L.Map.include(!zoomAnimated ? {} : {
 		// This anim frame should prevent an obscure iOS webkit tile loading race condition.
 		L.Util.requestAnimFrame(function () {
 			this._moveEnd(true);
+=======
+
+		this._animatingZoom = false;
+
+		L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
+
+		L.Util.requestAnimFrame(function () {
+			this._resetView(this._animateToCenter, this._animateToZoom, true, true);
+
+			if (L.Draggable) {
+				L.Draggable._disabled = false;
+			}
+>>>>>>> origin/0.7.8
 		}, this);
 	}
 });
