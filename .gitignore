@@ -4,12 +4,9 @@ tmp/**/*
 .idea
 .idea/**/*
 *.iml
+_site
 *.sublime-*
 _site
-dist/*.js
 coverage/
 *.js.html
-index.html
 .mailmap
-bower.json
-component.json
