@@ -22,7 +22,6 @@
     "prosthetic-hand": "^1.3.0",
     "source-map": "^0.5.3",
     "uglify-js": "~2.6.2"
-=======
   "version": "0.7.8",
   "description": "JavaScript library for mobile-friendly interactive maps",
   "devDependencies": {

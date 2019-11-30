@@ -16,7 +16,7 @@ function expose() {
 }
 =======
 L.version = '0.7.7';
->>>>>>> origin/0.7.8
+>>>>>>> master
 
 // define Leaflet for Node module pattern loaders, including Browserify
 if (typeof module === 'object' && typeof module.exports === 'object') {

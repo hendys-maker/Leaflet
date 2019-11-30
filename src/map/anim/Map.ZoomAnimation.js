@@ -101,12 +101,10 @@ L.Map.include(!zoomAnimated ? {} : {
 		if (startAnim) {
 			this._animatingZoom = true;
 =======
-	_animateZoom: function (center, zoom, origin, scale, delta, backwards, forTouchZoom) {
-
-		if (!forTouchZoom) {
+	_animateZoom: function (center, zoom, startAnim, noUpdate) {
+		if (startAnim) {
 			this._animatingZoom = true;
-		}
->>>>>>> origin/0.7.8
+>>>>>>> master
 
 			// remember what center/zoom to set after animation
 			this._animateToCenter = center;
@@ -115,17 +113,6 @@ L.Map.include(!zoomAnimated ? {} : {
 			L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
 		}
 
-<<<<<<< HEAD
-		// @event zoomanim: ZoomAnimEvent
-		// Fired on every frame of a zoom animation
-		this.fire('zoomanim', {
-			center: center,
-			zoom: zoom,
-			noUpdate: noUpdate
-		});
-
-		// Work around webkit not firing 'transitionend', see https://github.com/Leaflet/Leaflet/issues/3689, 2693
-		setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
 =======
 		L.Util.requestAnimFrame(function () {
 			this.fire('zoomanim', {
@@ -139,7 +126,6 @@ L.Map.include(!zoomAnimated ? {} : {
 			// horrible hack to work around a Chrome bug https://github.com/Leaflet/Leaflet/issues/3689
 			setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
 		}, this);
->>>>>>> origin/0.7.8
 	},
 
 	_onZoomTransitionEnd: function () {
@@ -155,7 +141,6 @@ L.Map.include(!zoomAnimated ? {} : {
 		// This anim frame should prevent an obscure iOS webkit tile loading race condition.
 		L.Util.requestAnimFrame(function () {
 			this._moveEnd(true);
-=======
 
 		this._animatingZoom = false;
 
@@ -167,7 +152,6 @@ L.Map.include(!zoomAnimated ? {} : {
 			if (L.Draggable) {
 				L.Draggable._disabled = false;
 			}
->>>>>>> origin/0.7.8
 		}, this);
 	}
 });

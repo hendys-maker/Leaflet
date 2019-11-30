@@ -30,7 +30,6 @@
 	    mobile = typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1,
 	    msPointer = !window.PointerEvent && window.MSPointerEvent,
 	    pointer = window.PointerEvent || msPointer,
-=======
 	    mobile = typeof orientation !== undefined + '',
 	    msPointer = !window.PointerEvent && window.MSPointerEvent,
 		pointer = (window.PointerEvent && window.navigator.pointerEnabled) ||
@@ -70,7 +69,6 @@
 		// @property gecko: Boolean
 		// `true` for gecko-based browsers like Firefox.
 		gecko: gecko,
-=======
 	    opera3d = 'OTransition' in doc.style,
 	    any3d = !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d || opera3d) && !phantomjs;
 

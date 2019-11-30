@@ -6,7 +6,6 @@ L.Marker.include({
 <<<<<<< HEAD
 	_getPopupAnchor: function () {
 		return this.options.icon.options.popupAnchor || [0, 0];
-=======
 	openPopup: function () {
 		if (this._popup && this._map && !this._map.hasLayer(this._popup)) {
 			this._popup.setLatLng(this._latlng);

@@ -11,7 +11,6 @@ git checkout -b build
 <<<<<<< HEAD
 jake build[,,true]
 git add dist/leaflet-src.js dist/leaflet.js dist/leaflet-src.map -f
-=======
 npm run build
 git add dist/leaflet-src.js dist/leaflet.js -f
 
@@ -28,8 +27,8 @@ git push --tags -f
 <<<<<<< HEAD
 npm publish --tag rc
 =======
-npm publish --tag beta
->>>>>>> origin/0.7.8
+npm publish --tag rc
+>>>>>>> master
 
 git checkout master
 git branch -D build

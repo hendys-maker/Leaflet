@@ -89,7 +89,6 @@ L.Control.Layers = L.Control.extend({
 		for (var id in this._layers) {
 			this._layers[id].layer.off('add remove', this._onLayerChange, this);
 		}
-=======
 	onRemove: function (map) {
 		map
 		    .off('layeradd', this._onLayerChange, this)

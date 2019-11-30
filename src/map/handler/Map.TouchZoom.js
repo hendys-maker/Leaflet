@@ -96,8 +96,8 @@ L.Map.TouchZoom = L.Handler.extend({
 <<<<<<< HEAD
 		L.DomEvent.preventDefault(e);
 =======
-		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
->>>>>>> origin/0.7.8
+		L.DomEvent.preventDefault(e);
+>>>>>>> master
 	},
 
 	_onTouchEnd: function () {

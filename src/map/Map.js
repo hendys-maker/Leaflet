@@ -199,7 +199,7 @@ L.Map = L.Evented.extend({
 		zoom = (typeof options.maxZoom === 'number') ? Math.min(options.maxZoom, zoom) : zoom;
 =======
 		zoom = (options.maxZoom) ? Math.min(options.maxZoom, zoom) : zoom;
->>>>>>> origin/0.7.8
+>>>>>>> master
 
 		var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
 
@@ -229,7 +229,7 @@ L.Map = L.Evented.extend({
 		return this.setView(target.center, target.zoom, options);
 =======
 		return this.setView(center, zoom, options);
->>>>>>> origin/0.7.8
+>>>>>>> master
 	},
 
 	// @method fitWorld(options?: fitBounds options): this
@@ -859,19 +859,6 @@ L.Map = L.Evented.extend({
 		return this.fire('move', data);
 	},
 
-<<<<<<< HEAD
-	_moveEnd: function (zoomChanged) {
-		// @event zoomend: Event
-		// Fired when the map has changed, after any animations.
-		if (zoomChanged) {
-			this.fire('zoomend');
-		}
-
-		// @event moveend: Event
-		// Fired when the center of the map stops changing (e.g. user stopped
-		// dragging the map).
-		return this.fire('moveend');
-	},
 =======
 		this.fire('viewreset', {hard: !preserveMapOffset});
 
@@ -881,7 +868,6 @@ L.Map = L.Evented.extend({
 		}
 
 		this.fire('move');
->>>>>>> origin/0.7.8
 
 	_stop: function () {
 		L.Util.cancelAnimFrame(this._flyToFrame);

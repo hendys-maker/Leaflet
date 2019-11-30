@@ -236,6 +236,6 @@ exports.test = function(complete, fail) {
 <<<<<<< HEAD
 =======
 
->>>>>>> origin/0.7.8
+>>>>>>> master
 	server.start();
 };

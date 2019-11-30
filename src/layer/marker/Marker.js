@@ -204,7 +204,7 @@ L.Marker = L.Layer.extend({
 <<<<<<< HEAD
 =======
 
->>>>>>> origin/0.7.8
+>>>>>>> master
 			if (options.alt) {
 				icon.alt = options.alt;
 			}
@@ -322,7 +322,6 @@ L.Marker = L.Layer.extend({
 <<<<<<< HEAD
 	// @method setOpacity(opacity: Number): this
 	// Changes the opacity of the marker.
-=======
 	_onMouseClick: function (e) {
 		var wasDragged = this.dragging && this.dragging.moved();
 

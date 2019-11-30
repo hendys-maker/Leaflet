@@ -187,7 +187,6 @@ L.TileLayer = L.GridLayer.extend({
 		    tileSize = L.GridLayer.prototype.getTileSize.call(this),
 		    zoom = this._tileZoom + this.options.zoomOffset,
 		    zoomN = this.options.maxNativeZoom;
-=======
 		    bounds = map.getPixelBounds(),
 		    zoom = map.getZoom(),
 		    tileSize = this._getTileSize();
@@ -301,7 +300,6 @@ L.TileLayer = L.GridLayer.extend({
 
 <<<<<<< HEAD
 		return options.maxNativeZoom !== null ? Math.min(zoom, options.maxNativeZoom) : zoom;
-=======
 		return options.maxNativeZoom ? Math.min(zoom, options.maxNativeZoom) : zoom;
 	},
 

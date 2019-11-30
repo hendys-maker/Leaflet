@@ -43,7 +43,7 @@ L.FeatureGroup = L.LayerGroup.extend({
 		if ('off' in layer) {
 			layer.off(L.FeatureGroup.EVENTS, this._propagateEvent, this);
 		}
->>>>>>> origin/0.7.8
+>>>>>>> master
 
 		L.LayerGroup.prototype.removeLayer.call(this, layer);
 

@@ -124,7 +124,7 @@ L.Draggable = L.Evented.extend({
 		if (Math.abs(offset.x) + Math.abs(offset.y) < this.options.clickTolerance) { return; }
 =======
 		if (L.Browser.touch && Math.abs(offset.x) + Math.abs(offset.y) < 3) { return; }
->>>>>>> origin/0.7.8
+>>>>>>> master
 
 		L.DomEvent.preventDefault(e);
 
@@ -147,7 +147,7 @@ L.Draggable = L.Evented.extend({
 			}
 =======
 			this._lastTarget = e.target || e.srcElement;
->>>>>>> origin/0.7.8
+>>>>>>> master
 			L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
 		}
 
@@ -182,7 +182,7 @@ L.Draggable = L.Evented.extend({
 
 =======
 	_onUp: function () {
->>>>>>> origin/0.7.8
+>>>>>>> master
 		L.DomUtil.removeClass(document.body, 'leaflet-dragging');
 
 		if (this._lastTarget) {
