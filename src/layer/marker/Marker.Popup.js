@@ -3,9 +3,6 @@
  */
 
 L.Marker.include({
-<<<<<<< HEAD
-	_getPopupAnchor: function () {
-		return this.options.icon.options.popupAnchor || [0, 0];
 	openPopup: function () {
 		if (this._popup && this._map && !this._map.hasLayer(this._popup)) {
 			this._popup.setLatLng(this._latlng);
@@ -89,6 +86,5 @@ L.Marker.include({
 
 	_movePopup: function (e) {
 		this._popup.setLatLng(e.latlng);
->>>>>>> origin/0.7.8
 	}
 });

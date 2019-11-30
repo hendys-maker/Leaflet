@@ -1,12 +1,5 @@
 {
   "name": "leaflet",
-<<<<<<< HEAD
-  "description": "JavaScript library for mobile-friendly interactive maps",
-  "main": [
-    "dist/leaflet.css",
-    "dist/leaflet-src.js"
-  ],
-   "ignore": [
   "version": "0.7.8",
   "description": "JavaScript library for mobile-friendly interactive maps",
   "main": [
@@ -19,7 +12,6 @@
     "dist/images/marker-shadow.png"
   ],
   "ignore": [
->>>>>>> origin/0.7.8
     ".*",
     "CHANGELOG.json",
     "FAQ.md",

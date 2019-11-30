@@ -2,63 +2,27 @@
  * Extends L.Map to handle zoom animations.
  */
 
-// @namespace Map
-// @section Animation Options
 L.Map.mergeOptions({
-	// @option zoomAnimation: Boolean = true
-	// Whether the map zoom animation is enabled. By default it's enabled
-	// in all browsers that support CSS3 Transitions except Android.
 	zoomAnimation: true,
-
-	// @option zoomAnimationThreshold: Number = 4
-	// Won't animate zoom if the zoom difference exceeds this value.
 	zoomAnimationThreshold: 4
 });
 
-var zoomAnimated = L.DomUtil.TRANSITION && L.Browser.any3d && !L.Browser.mobileOpera;
-
-if (zoomAnimated) {
+if (L.DomUtil.TRANSITION) {
 
 	L.Map.addInitHook(function () {
 		// don't animate on browsers without hardware-accelerated transitions or old Android/Opera
-		this._zoomAnimated = this.options.zoomAnimation;
+		this._zoomAnimated = this.options.zoomAnimation && L.DomUtil.TRANSITION &&
+				L.Browser.any3d && !L.Browser.android23 && !L.Browser.mobileOpera;
 
 		// zoom transitions run with the same duration for all layers, so if one of transitionend events
 		// happens after starting zoom animation (propagating to the map pane), we know that it ended globally
 		if (this._zoomAnimated) {
-
-			this._createAnimProxy();
-
-			L.DomEvent.on(this._proxy, L.DomUtil.TRANSITION_END, this._catchTransitionEnd, this);
+			L.DomEvent.on(this._mapPane, L.DomUtil.TRANSITION_END, this._catchTransitionEnd, this);
 		}
 	});
 }
 
-L.Map.include(!zoomAnimated ? {} : {
-
-	_createAnimProxy: function () {
-
-		var proxy = this._proxy = L.DomUtil.create('div', 'leaflet-proxy leaflet-zoom-animated');
-		this._panes.mapPane.appendChild(proxy);
-
-		this.on('zoomanim', function (e) {
-			var prop = L.DomUtil.TRANSFORM,
-			    transform = proxy.style[prop];
-
-			L.DomUtil.setTransform(proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
-
-			// workaround for case when transform is the same and so transitionend event is not fired
-			if (transform === proxy.style[prop] && this._animatingZoom) {
-				this._onZoomTransitionEnd();
-			}
-		}, this);
-
-		this.on('load moveend', function () {
-			var c = this.getCenter(),
-			    z = this.getZoom();
-			L.DomUtil.setTransform(proxy, this.project(c, z), this.getZoomScale(z, 1));
-		}, this);
-	},
+L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 
 	_catchTransitionEnd: function (e) {
 		if (this._animatingZoom && e.propertyName.indexOf('transform') >= 0) {
@@ -82,38 +46,39 @@ L.Map.include(!zoomAnimated ? {} : {
 
 		// offset is the pixel coords of the zoom origin relative to the current center
 		var scale = this.getZoomScale(zoom),
-		    offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale);
+		    offset = this._getCenterOffset(center)._divideBy(1 - 1 / scale),
+			origin = this._getCenterLayerPoint()._add(offset);
 
 		// don't animate if the zoom origin isn't within one screen from the current center, unless forced
 		if (options.animate !== true && !this.getSize().contains(offset)) { return false; }
 
-		L.Util.requestAnimFrame(function () {
-			this
-			    ._moveStart(true)
-			    ._animateZoom(center, zoom, true);
-		}, this);
+		this
+		    .fire('movestart')
+		    .fire('zoomstart');
+
+		this._animateZoom(center, zoom, origin, scale, null, true);
 
 		return true;
 	},
 
-<<<<<<< HEAD
-	_animateZoom: function (center, zoom, startAnim, noUpdate) {
-		if (startAnim) {
-			this._animatingZoom = true;
-=======
-	_animateZoom: function (center, zoom, startAnim, noUpdate) {
-		if (startAnim) {
-			this._animatingZoom = true;
->>>>>>> master
+	_animateZoom: function (center, zoom, origin, scale, delta, backwards, forTouchZoom) {
 
-			// remember what center/zoom to set after animation
-			this._animateToCenter = center;
-			this._animateToZoom = zoom;
-
-			L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
+		if (!forTouchZoom) {
+			this._animatingZoom = true;
 		}
 
-=======
+		// put transform transition on all layers with leaflet-zoom-animated class
+		L.DomUtil.addClass(this._mapPane, 'leaflet-zoom-anim');
+
+		// remember what center/zoom to set after animation
+		this._animateToCenter = center;
+		this._animateToZoom = zoom;
+
+		// disable any dragging during animation
+		if (L.Draggable) {
+			L.Draggable._disabled = true;
+		}
+
 		L.Util.requestAnimFrame(function () {
 			this.fire('zoomanim', {
 				center: center,
@@ -130,17 +95,6 @@ L.Map.include(!zoomAnimated ? {} : {
 
 	_onZoomTransitionEnd: function () {
 		if (!this._animatingZoom) { return; }
-<<<<<<< HEAD
-
-		L.DomUtil.removeClass(this._mapPane, 'leaflet-zoom-anim');
-
-		this._animatingZoom = false;
-
-		this._move(this._animateToCenter, this._animateToZoom);
-
-		// This anim frame should prevent an obscure iOS webkit tile loading race condition.
-		L.Util.requestAnimFrame(function () {
-			this._moveEnd(true);
 
 		this._animatingZoom = false;
 
