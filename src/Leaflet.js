@@ -1,23 +1,27 @@
 
-var L = {
-	version: 'dev'
-};
+import {version} from '../package.json';
+export {version};
 
-function expose() {
-	var oldL = window.L;
+// control
+export * from './control/index';
 
-L.version = '0.7.7';
+// core
+export * from './core/index';
 
-// define Leaflet for Node module pattern loaders, including Browserify
-if (typeof module === 'object' && typeof module.exports === 'object') {
-	module.exports = L;
+// dom
+export * from './dom/index';
 
-// define Leaflet as an AMD module
-} else if (typeof define === 'function' && define.amd) {
-	define(L);
-}
+// geometry
+export * from './geometry/index';
 
-// define Leaflet as a global L variable, saving the original L to restore later if needed
-if (typeof window !== 'undefined') {
-	expose();
-}
+// geo
+export * from './geo/index';
+
+// layer
+export * from './layer/index';
+
+// map
+export * from './map/index';
+
+import {freeze} from './core/Util';
+Object.freeze = freeze;

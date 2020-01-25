@@ -4,7 +4,6 @@ tmp/**/*
 .idea
 .idea/**/*
 *.iml
-_site
 *.sublime-*
 _site
 dist/*.js
