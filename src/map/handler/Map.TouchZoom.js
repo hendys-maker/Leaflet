@@ -21,22 +21,21 @@ L.Map.TouchZoom = L.Handler.extend({
 
 		if (!e.touches || e.touches.length !== 2 || map._animatingZoom || this._zooming) { return; }
 
-		var p1 = map.mouseEventToContainerPoint(e.touches[0]),
-		    p2 = map.mouseEventToContainerPoint(e.touches[1]);
+		var p1 = map.mouseEventToLayerPoint(e.touches[0]),
+		    p2 = map.mouseEventToLayerPoint(e.touches[1]),
+		    viewCenter = map._getCenterLayerPoint();
 
-		this._centerPoint = map.getSize()._divideBy(2);
-		this._startLatLng = map.containerPointToLatLng(this._centerPoint);
-		if (map.options.touchZoom !== 'center') {
-			this._pinchStartLatLng = map.containerPointToLatLng(p1.add(p2)._divideBy(2));
-		}
-
+		this._startCenter = p1.add(p2)._divideBy(2);
 		this._startDist = p1.distanceTo(p2);
-		this._startZoom = map.getZoom();
 
 		this._moved = false;
 		this._zooming = true;
 
-		map.stop();
+		this._centerOffset = viewCenter.subtract(this._startCenter);
+
+		if (map._panAnim) {
+			map._panAnim.stop();
+		}
 
 		L.DomEvent
 		    .on(document, 'touchmove', this._onTouchMove, this)
@@ -46,42 +45,47 @@ L.Map.TouchZoom = L.Handler.extend({
 	},
 
 	_onTouchMove: function (e) {
+		var map = this._map;
+
 		if (!e.touches || e.touches.length !== 2 || !this._zooming) { return; }
 
-		var map = this._map,
-		    p1 = map.mouseEventToContainerPoint(e.touches[0]),
-		    p2 = map.mouseEventToContainerPoint(e.touches[1]),
-		    scale = p1.distanceTo(p2) / this._startDist;
+		var p1 = map.mouseEventToLayerPoint(e.touches[0]),
+		    p2 = map.mouseEventToLayerPoint(e.touches[1]);
 
+		this._scale = p1.distanceTo(p2) / this._startDist;
+		this._delta = p1._add(p2)._divideBy(2)._subtract(this._startCenter);
 
-		this._zoom = map.getScaleZoom(scale, this._startZoom);
-
-		if (map.options.touchZoom === 'center') {
-			this._center = this._startLatLng;
-			if (scale === 1) { return; }
-		} else {
-			// Get delta from pinch to center, so centerLatLng is delta applied to initial pinchLatLng
-			var delta = p1._add(p2)._divideBy(2)._subtract(this._centerPoint);
-			if (scale === 1 && delta.x === 0 && delta.y === 0) { return; }
-			this._center = map.unproject(map.project(this._pinchStartLatLng).subtract(delta));
-		}
+		if (this._scale === 1) { return; }
 
 		if (!map.options.bounceAtZoomLimits) {
-			if ((this._zoom <= map.getMinZoom() && scale < 1) ||
-		        (this._zoom >= map.getMaxZoom() && scale > 1)) { return; }
+			if ((map.getZoom() === map.getMinZoom() && this._scale < 1) ||
+			    (map.getZoom() === map.getMaxZoom() && this._scale > 1)) { return; }
 		}
 
 		if (!this._moved) {
-			map._moveStart(true);
+			L.DomUtil.addClass(map._mapPane, 'leaflet-touching');
+
+			map
+			    .fire('movestart')
+			    .fire('zoomstart');
+
 			this._moved = true;
 		}
 
 		L.Util.cancelAnimFrame(this._animRequest);
-
-		var moveFn = L.bind(map._move, map, this._center, this._zoom, {pinch: true, round: false});
-		this._animRequest = L.Util.requestAnimFrame(moveFn, this, true);
+		this._animRequest = L.Util.requestAnimFrame(
+		        this._updateOnMove, this, true, this._map._container);
 
 		L.DomEvent.preventDefault(e);
+	},
+
+	_updateOnMove: function () {
+		var map = this._map,
+		    origin = this._getScaleOrigin(),
+		    center = map.layerPointToLatLng(origin),
+		    zoom = map.getScaleZoom(this._scale);
+
+		map._animateZoom(center, zoom, this._startCenter, this._scale, this._delta, false, true);
 	},
 
 	_onTouchEnd: function () {
@@ -90,18 +94,33 @@ L.Map.TouchZoom = L.Handler.extend({
 			return;
 		}
 
+		var map = this._map;
+
 		this._zooming = false;
+		L.DomUtil.removeClass(map._mapPane, 'leaflet-touching');
 		L.Util.cancelAnimFrame(this._animRequest);
 
 		L.DomEvent
 		    .off(document, 'touchmove', this._onTouchMove)
 		    .off(document, 'touchend', this._onTouchEnd);
 
-		var zoom = this._zoom;
-		zoom = this._map._limitZoom(zoom - this._startZoom > 0 ? Math.ceil(zoom) : Math.floor(zoom));
+		var origin = this._getScaleOrigin(),
+		    center = map.layerPointToLatLng(origin),
 
+		    oldZoom = map.getZoom(),
+		    floatZoomDelta = map.getScaleZoom(this._scale) - oldZoom,
+		    roundZoomDelta = (floatZoomDelta > 0 ?
+		            Math.ceil(floatZoomDelta) : Math.floor(floatZoomDelta)),
 
-		this._map._animateZoom(this._center, zoom, true, true);
+		    zoom = map._limitZoom(oldZoom + roundZoomDelta),
+		    scale = map.getZoomScale(zoom) / this._scale;
+
+		map._animateZoom(center, zoom, origin, scale);
+	},
+
+	_getScaleOrigin: function () {
+		var centerOffset = this._centerOffset.subtract(this._delta).divideBy(this._scale);
+		return this._startCenter.add(centerOffset);
 	}
 });
 

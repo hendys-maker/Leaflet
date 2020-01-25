@@ -2,7 +2,8 @@
  * L.Draggable allows you to add dragging capabilities to any element. Supports mobile devices too.
  */
 
-L.Draggable = L.Evented.extend({
+L.Draggable = L.Class.extend({
+	includes: L.Mixin.Events,
 
 	statics: {
 		START: L.Browser.touch ? ['touchstart', 'mousedown'] : ['mousedown'],
@@ -20,16 +21,17 @@ L.Draggable = L.Evented.extend({
 		}
 	},
 
-	initialize: function (element, dragStartTarget, preventOutline) {
+	initialize: function (element, dragStartTarget) {
 		this._element = element;
 		this._dragStartTarget = dragStartTarget || element;
-		this._preventOutline = preventOutline;
 	},
 
 	enable: function () {
 		if (this._enabled) { return; }
 
-		L.DomEvent.on(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+		for (var i = L.Draggable.START.length - 1; i >= 0; i--) {
+			L.DomEvent.on(this._dragStartTarget, L.Draggable.START[i], this._onDown, this);
+		}
 
 		this._enabled = true;
 	},
@@ -37,7 +39,9 @@ L.Draggable = L.Evented.extend({
 	disable: function () {
 		if (!this._enabled) { return; }
 
-		L.DomEvent.off(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+		for (var i = L.Draggable.START.length - 1; i >= 0; i--) {
+			L.DomEvent.off(this._dragStartTarget, L.Draggable.START[i], this._onDown, this);
+		}
 
 		this._enabled = false;
 		this._moved = false;
@@ -46,21 +50,16 @@ L.Draggable = L.Evented.extend({
 	_onDown: function (e) {
 		this._moved = false;
 
-		if (L.DomUtil.hasClass(this._element, 'leaflet-zoom-anim')) { return; }
+		if (e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches)) { return; }
 
-		if (L.Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches) || !this._enabled) { return; }
-		L.Draggable._dragging = true;  // Prevent dragging multiple objects at once.
+		L.DomEvent.stopPropagation(e);
 
-		if (this._preventOutline) {
-			L.DomUtil.preventOutline(this._element);
-		}
+		if (L.Draggable._disabled) { return; }
 
 		L.DomUtil.disableImageDrag();
 		L.DomUtil.disableTextSelection();
 
 		if (this._moving) { return; }
-
-		this.fire('down');
 
 		var first = e.touches ? e.touches[0] : e;
 
@@ -94,7 +93,6 @@ L.Draggable = L.Evented.extend({
 			this._startPos = L.DomUtil.getPosition(this._element).subtract(offset);
 
 			L.DomUtil.addClass(document.body, 'leaflet-dragging');
-
 			this._lastTarget = e.target || e.srcElement;
 			L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
 		}
@@ -103,15 +101,13 @@ L.Draggable = L.Evented.extend({
 		this._moving = true;
 
 		L.Util.cancelAnimFrame(this._animRequest);
-		this._lastEvent = e;
-		this._animRequest = L.Util.requestAnimFrame(this._updatePosition, this, true);
+		this._animRequest = L.Util.requestAnimFrame(this._updatePosition, this, true, this._dragStartTarget);
 	},
 
 	_updatePosition: function () {
-		var e = {originalEvent: this._lastEvent};
-		this.fire('predrag', e);
+		this.fire('predrag');
 		L.DomUtil.setPosition(this._element, this._newPos);
-		this.fire('drag', e);
+		this.fire('drag');
 	},
 
 	_onUp: function () {
@@ -124,8 +120,8 @@ L.Draggable = L.Evented.extend({
 
 		for (var i in L.Draggable.MOVE) {
 			L.DomEvent
-			    .off(document, L.Draggable.MOVE[i], this._onMove, this)
-			    .off(document, L.Draggable.END[i], this._onUp, this);
+			    .off(document, L.Draggable.MOVE[i], this._onMove)
+			    .off(document, L.Draggable.END[i], this._onUp);
 		}
 
 		L.DomUtil.enableImageDrag();
@@ -141,6 +137,5 @@ L.Draggable = L.Evented.extend({
 		}
 
 		this._moving = false;
-		L.Draggable._dragging = false;
 	}
 });

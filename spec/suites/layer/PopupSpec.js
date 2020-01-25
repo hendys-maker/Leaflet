@@ -242,6 +242,12 @@ describe("L.Map#openPopup", function () {
 		map.setView(new L.LatLng(55.8, 37.6), 6);
 	});
 
+	afterEach(function () {
+		if (document.body.contains(c)) {
+			document.body.removeChild(c);
+		}
+	});
+
 	it("adds the popup layer to the map", function () {
 		var popup = new L.Popup()
 			.setLatLng(new L.LatLng(55.8, 37.6));
@@ -290,12 +296,16 @@ describe("L.Map#openPopup", function () {
 		map.openPopup(p);
 		expect(map.hasLayer(p)).to.be(true);
 		map.on('drag', spy);
-		happen.drag(coords.left + 100, coords.top + 100, coords.left + 110, coords.top + 110, function () {
+		var hand = new Hand({timing: 'fastframe'});
+		var mouse = hand.growFinger('mouse');
+		mouse.moveTo(coords.left + 100, coords.left + 100, 0)
+			.down().moveBy(10, 10, 20).up();
+
+		setTimeout(function () {
 			expect(spy.called).to.be(true);
 			expect(map.hasLayer(p)).to.be(true);
-			document.body.removeChild(c);
 			done();
-		});
+		}, 100);
 	});
 
 });

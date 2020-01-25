@@ -1,7 +1,7 @@
 var fs = require('fs'),
+    jshint = require('jshint'),
     UglifyJS = require('uglify-js'),
     zlib = require('zlib'),
-    MagicString = require('magic-string'),
 
     deps = require('./deps.js').deps;
 
@@ -70,44 +70,31 @@ function loadSilently(path) {
 	}
 }
 
-function bundleFiles(files, copy) {
-	var bundle = new MagicString.Bundle();
-
+function combineFiles(files) {
+	var content = '';
 	for (var i = 0, len = files.length; i < len; i++) {
-		bundle.addSource({
-			filename: files[i],
-			content: new MagicString( fs.readFileSync(files[i], 'utf8') + '\n\n' )
-		});
+		content += fs.readFileSync(files[i], 'utf8') + '\n\n';
 	}
-
-	bundle.prepend(
-		copy + '(function (window, document, undefined) {'
-	).append('}(window, document));');
-
-	return bundle;
+	return content;
 }
 
 function bytesToKB(bytes) {
     return (bytes / 1024).toFixed(2) + ' KB';
 };
 
-exports.build = function (callback, version, compsBase32, buildName) {
+exports.build = function (callback, compsBase32, buildName) {
 
 	var files = getFiles(compsBase32);
 
-	console.log('Bundling and compressing ' + files.length + ' files...');
+	console.log('Concatenating and compressing ' + files.length + ' files...');
 
-	var copy = fs.readFileSync('src/copyright.js', 'utf8').replace('{VERSION}', version),
+	var copy = fs.readFileSync('src/copyright.js', 'utf8'),
+	    intro = '(function (window, document, undefined) {',
+	    outro = '}(window, document));',
+	    newSrc = copy + intro + combineFiles(files) + outro,
 
-	    filenamePart = 'leaflet' + (buildName ? '-' + buildName : ''),
-	    pathPart = 'dist/' + filenamePart,
+	    pathPart = 'dist/leaflet' + (buildName ? '-' + buildName : ''),
 	    srcPath = pathPart + '-src.js',
-	    mapPath = pathPart + '-src.map',
-	    srcFilename = filenamePart + '-src.js',
-	    mapFilename = filenamePart + '-src.map',
-
-	    bundle = bundleFiles(files, copy),
-	    newSrc = bundle.toString() + '\n//# sourceMappingURL=' + mapFilename,
 
 	    oldSrc = loadSilently(srcPath),
 	    srcDelta = getSizeDelta(newSrc, oldSrc, true);
@@ -116,11 +103,6 @@ exports.build = function (callback, version, compsBase32, buildName) {
 
 	if (newSrc !== oldSrc) {
 		fs.writeFileSync(srcPath, newSrc);
-		fs.writeFileSync(mapPath, bundle.generateMap({
-			file: srcFilename,
-			includeContent: true,
-			hires: false
-		}));
 		console.log('\tSaved to ' + srcPath);
 	}
 
@@ -161,7 +143,7 @@ exports.build = function (callback, version, compsBase32, buildName) {
 	});
 };
 
-exports.test = function(complete, fail) {
+exports.test = function(callback) {
 	var karma = require('karma'),
 	    testConfig = {configFile : __dirname + '/../spec/karma.conf.js'},
 	    autoSlimer = false;
@@ -198,7 +180,7 @@ exports.test = function(complete, fail) {
 
 	if (isArgv('--cov')) {
 		testConfig.preprocessors = {
-			'src/**/*.js': 'coverage'
+			'../src/**/*.js': 'coverage'
 		};
 		testConfig.coverageReporter = {
 			type : 'html',
@@ -225,10 +207,9 @@ exports.test = function(complete, fail) {
 
 		if (!exitCode) {
 			console.log('\tTests ran successfully.\n');
-			complete();
-		} else {
-			process.exit(exitCode);
 		}
+		callback();
 	});
+
 	server.start();
 };

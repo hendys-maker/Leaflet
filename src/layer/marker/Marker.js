@@ -2,21 +2,20 @@
  * L.Marker is used to display clickable/draggable icons on the map.
  */
 
-L.Marker = L.Layer.extend({
+L.Marker = L.Class.extend({
+
+	includes: L.Mixin.Events,
 
 	options: {
-		pane: 'markerPane',
-		nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
-
 		icon: new L.Icon.Default(),
-		// title: '',
-		// alt: '',
-		interactive: true,
-		// draggable: false,
+		title: '',
+		alt: '',
+		clickable: true,
+		draggable: false,
 		keyboard: true,
 		zIndexOffset: 0,
 		opacity: 1,
-		// riseOnHover: false,
+		riseOnHover: false,
 		riseOffset: 250
 	},
 
@@ -26,33 +25,40 @@ L.Marker = L.Layer.extend({
 	},
 
 	onAdd: function (map) {
-		this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
+		this._map = map;
+
+		map.on('viewreset', this.update, this);
 
 		this._initIcon();
 		this.update();
+		this.fire('add');
+
+		if (map.options.zoomAnimation && map.options.markerZoomAnimation) {
+			map.on('zoomanim', this._animateZoom, this);
+		}
 	},
 
-	onRemove: function () {
-		if (this.dragging && this.dragging.enabled()) {
-			this.options.draggable = true;
-			this.dragging.removeHooks();
+	addTo: function (map) {
+		map.addLayer(this);
+		return this;
+	},
+
+	onRemove: function (map) {
+		if (this.dragging) {
+			this.dragging.disable();
 		}
 
 		this._removeIcon();
 		this._removeShadow();
-	},
 
-	getEvents: function () {
-		var events = {
-			zoom: this.update,
-			viewreset: this.update
-		};
+		this.fire('remove');
 
-		if (this._zoomAnimated) {
-			events.zoomanim = this._animateZoom;
-		}
+		map.off({
+			'viewreset': this.update,
+			'zoomanim': this._animateZoom
+		}, this);
 
-		return events;
+		this._map = null;
 	},
 
 	getLatLng: function () {
@@ -60,15 +66,18 @@ L.Marker = L.Layer.extend({
 	},
 
 	setLatLng: function (latlng) {
-		var oldLatLng = this._latlng;
 		this._latlng = L.latLng(latlng);
+
 		this.update();
-		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng});
+
+		return this.fire('move', { latlng: this._latlng });
 	},
 
 	setZIndexOffset: function (offset) {
 		this.options.zIndexOffset = offset;
-		return this.update();
+		this.update();
+
+		return this;
 	},
 
 	setIcon: function (icon) {
@@ -81,32 +90,27 @@ L.Marker = L.Layer.extend({
 		}
 
 		if (this._popup) {
-			this.bindPopup(this._popup, this._popup.options);
+			this.bindPopup(this._popup);
 		}
 
 		return this;
 	},
 
-	getElement: function () {
-		return this._icon;
-	},
-
 	update: function () {
-
 		if (this._icon) {
-			var pos = this._map.latLngToLayerPoint(this._latlng).round();
-			this._setPos(pos);
+			this._setPos(this._map.latLngToLayerPoint(this._latlng).round());
 		}
-
 		return this;
 	},
 
 	_initIcon: function () {
 		var options = this.options,
-		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+		    map = this._map,
+		    animation = (map.options.zoomAnimation && map.options.markerZoomAnimation),
+		    classToAdd = animation ? 'leaflet-zoom-animated' : 'leaflet-zoom-hide';
 
 		var icon = options.icon.createIcon(this._icon),
-		    addIcon = false;
+			addIcon = false;
 
 		// if we're not reusing the icon, remove the old one and init new one
 		if (icon !== this._icon) {
@@ -118,6 +122,7 @@ L.Marker = L.Layer.extend({
 			if (options.title) {
 				icon.title = options.title;
 			}
+
 			if (options.alt) {
 				icon.alt = options.alt;
 			}
@@ -131,15 +136,16 @@ L.Marker = L.Layer.extend({
 
 		this._icon = icon;
 
+		this._initInteraction();
+
 		if (options.riseOnHover) {
-			this.on({
-				mouseover: this._bringToFront,
-				mouseout: this._resetZIndex
-			});
+			L.DomEvent
+				.on(icon, 'mouseover', this._bringToFront, this)
+				.on(icon, 'mouseout', this._resetZIndex, this);
 		}
 
 		var newShadow = options.icon.createShadow(this._shadow),
-		    addShadow = false;
+			addShadow = false;
 
 		if (newShadow !== this._shadow) {
 			this._removeShadow();
@@ -157,32 +163,32 @@ L.Marker = L.Layer.extend({
 		}
 
 
+		var panes = this._map._panes;
+
 		if (addIcon) {
-			this.getPane().appendChild(this._icon);
+			panes.markerPane.appendChild(this._icon);
 		}
-		this._initInteraction();
+
 		if (newShadow && addShadow) {
-			this.getPane('shadowPane').appendChild(this._shadow);
+			panes.shadowPane.appendChild(this._shadow);
 		}
 	},
 
 	_removeIcon: function () {
 		if (this.options.riseOnHover) {
-			this.off({
-				mouseover: this._bringToFront,
-				mouseout: this._resetZIndex
-			});
+			L.DomEvent
+			    .off(this._icon, 'mouseover', this._bringToFront)
+			    .off(this._icon, 'mouseout', this._resetZIndex);
 		}
 
-		L.DomUtil.remove(this._icon);
-		this.removeInteractiveTarget(this._icon);
+		this._map._panes.markerPane.removeChild(this._icon);
 
 		this._icon = null;
 	},
 
 	_removeShadow: function () {
 		if (this._shadow) {
-			L.DomUtil.remove(this._shadow);
+			this._map._panes.shadowPane.removeChild(this._shadow);
 		}
 		this._shadow = null;
 	},
@@ -211,24 +217,73 @@ L.Marker = L.Layer.extend({
 
 	_initInteraction: function () {
 
-		if (!this.options.interactive) { return; }
+		if (!this.options.clickable) { return; }
 
-		L.DomUtil.addClass(this._icon, 'leaflet-interactive');
+		// TODO refactor into something shared with Map/Path/etc. to DRY it up
 
-		this.addInteractiveTarget(this._icon);
+		var icon = this._icon,
+		    events = ['dblclick', 'mousedown', 'mouseover', 'mouseout', 'contextmenu'];
+
+		L.DomUtil.addClass(icon, 'leaflet-clickable');
+		L.DomEvent.on(icon, 'click', this._onMouseClick, this);
+		L.DomEvent.on(icon, 'keypress', this._onKeyPress, this);
+
+		for (var i = 0; i < events.length; i++) {
+			L.DomEvent.on(icon, events[i], this._fireMouseEvent, this);
+		}
 
 		if (L.Handler.MarkerDrag) {
-			var draggable = this.options.draggable;
-			if (this.dragging) {
-				draggable = this.dragging.enabled();
-				this.dragging.disable();
-			}
-
 			this.dragging = new L.Handler.MarkerDrag(this);
 
-			if (draggable) {
+			if (this.options.draggable) {
 				this.dragging.enable();
 			}
+		}
+	},
+
+	_onMouseClick: function (e) {
+		var wasDragged = this.dragging && this.dragging.moved();
+
+		if (this.hasEventListeners(e.type) || wasDragged) {
+			L.DomEvent.stopPropagation(e);
+		}
+
+		if (wasDragged) { return; }
+
+		if ((!this.dragging || !this.dragging._enabled) && this._map &&
+					this._map.dragging && this._map.dragging.moved()) { return; }
+
+		this.fire(e.type, {
+			originalEvent: e,
+			latlng: this._latlng
+		});
+	},
+
+	_onKeyPress: function (e) {
+		if (e.keyCode === 13) {
+			this.fire('click', {
+				originalEvent: e,
+				latlng: this._latlng
+			});
+		}
+	},
+
+	_fireMouseEvent: function (e) {
+
+		this.fire(e.type, {
+			originalEvent: e,
+			latlng: this._latlng
+		});
+
+		// TODO proper custom event propagation
+		// this line will always be called if marker is in a FeatureGroup
+		if (e.type === 'contextmenu' && this.hasEventListeners(e.type)) {
+			L.DomEvent.preventDefault(e);
+		}
+		if (e.type !== 'mousedown') {
+			L.DomEvent.stopPropagation(e);
+		} else {
+			L.DomEvent.preventDefault(e);
 		}
 	},
 
@@ -242,12 +297,9 @@ L.Marker = L.Layer.extend({
 	},
 
 	_updateOpacity: function () {
-		var opacity = this.options.opacity;
-
-		L.DomUtil.setOpacity(this._icon, opacity);
-
+		L.DomUtil.setOpacity(this._icon, this.options.opacity);
 		if (this._shadow) {
-			L.DomUtil.setOpacity(this._shadow, opacity);
+			L.DomUtil.setOpacity(this._shadow, this.options.opacity);
 		}
 	},
 
