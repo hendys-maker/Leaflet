@@ -22,8 +22,40 @@ if (L.DomUtil.TRANSITION) {
 	});
 }
 
+<<<<<<< HEAD
 L.Map.include(!L.DomUtil.TRANSITION ? {} : {
 
+=======
+L.Map.include(!zoomAnimated ? {} : {
+
+	_createAnimProxy: function () {
+
+		var proxy = this._proxy = L.DomUtil.create('div', 'leaflet-proxy leaflet-zoom-animated');
+		this._panes.mapPane.appendChild(proxy);
+
+		this.on('zoomanim', function (e) {
+			var prop = L.DomUtil.TRANSFORM,
+				transform = proxy.style[prop];
+
+			L.DomUtil.setTransform(proxy, this.project(e.center, e.zoom), this.getZoomScale(e.zoom, 1));
+
+			// workaround for case when transform is the same and so transitionend event is not fired
+			if (transform === proxy.style[prop] & this._animatingZoom) {
+				this._onZoomTransitionEnd();
+			}
+		}, this);
+
+<<<<<<< HEAD
+=======
+		this.on('load moveend', function () {
+			var c = this.getCenter(),
+				z = this.getZoom();
+			L.DomUtil.setTransform(proxy, this.project(c, z), this.getZoomScale(z, 1));
+		}, this);
+	},
+
+>>>>>>> master
+>>>>>>> upstream/master-docs-merge
 	_catchTransitionEnd: function (e) {
 		if (this._animatingZoom && e.propertyName.indexOf('transform') >= 0) {
 			this._onZoomTransitionEnd();
