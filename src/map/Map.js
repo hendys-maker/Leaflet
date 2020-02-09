@@ -225,8 +225,12 @@ L.Map = L.Class.extend({
 	hasLayer: function (layer) {
 		if (!layer) { return false; }
 
+<<<<<<< HEAD
 		return (L.stamp(layer) in this._layers);
 	},
+=======
+		if (this.options.crs.equals(center, newCenter)) { return this; }
+>>>>>>> origin/move-latlng-equals-to-crs
 
 	eachLayer: function (method, context) {
 		for (var i in this._layers) {

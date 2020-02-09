@@ -43,15 +43,7 @@ L.LatLng.prototype = {
 	// @method equals(otherLatLng: LatLng, maxMargin?: Number): Boolean
 	// Returns `true` if the given `LatLng` point is at the same position (within a small margin of error). The margin of error can be overriden by setting `maxMargin` to a small number.
 	equals: function (obj, maxMargin) {
-		if (!obj) { return false; }
-
-		obj = L.latLng(obj);
-
-		var margin = Math.max(
-		        Math.abs(this.lat - obj.lat),
-		        Math.abs(this.lng - obj.lng));
-
-		return margin <= (maxMargin === undefined ? 1.0E-9 : maxMargin);
+		return L.CRS.Earth.equals(this, obj, maxMargin);
 	},
 
 	// @method toString(): String
