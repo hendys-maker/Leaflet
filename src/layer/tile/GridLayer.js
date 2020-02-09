@@ -867,9 +867,13 @@ L.GridLayer = L.Layer.extend({
 			this._updateLevels();
 			this._resetGrid();
 
+<<<<<<< HEAD
 			if (tileZoom !== undefined) {
 				this._update(center);
 			}
+=======
+			this._update(center, tileZoom);
+>>>>>>> origin/mobile-setview
 
 			if (!noPrune) {
 				this._pruneTiles();
