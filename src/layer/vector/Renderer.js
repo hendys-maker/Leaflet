@@ -62,6 +62,7 @@ L.Renderer = L.Layer.extend({
 		return events;
 	},
 
+<<<<<<< HEAD
 	_onAnimZoom: function (ev) {
 		this._updateTransform(ev.center, ev.zoom);
 	},
@@ -86,6 +87,11 @@ L.Renderer = L.Layer.extend({
 			L.DomUtil.setPosition(this._container, topLeftOffset);
 		}
 	},
+=======
+	_animateZoom: function (e) {
+		var origin = e.origin.subtract(this._map._getCenterLayerPoint()),
+		    offset = this._bounds.min.add(origin.multiplyBy(1 - e.scale)).add(e.offset).round();
+>>>>>>> origin/pyramid
 
 	_reset: function () {
 		this._update();

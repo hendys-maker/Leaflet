@@ -109,12 +109,17 @@ L.Map.TouchZoom = L.Handler.extend({
 		    center = map.layerPointToLatLng(origin),
 
 		    oldZoom = map.getZoom(),
+<<<<<<< HEAD
 		    floatZoomDelta = map.getScaleZoom(this._scale) - oldZoom,
 		    roundZoomDelta = (floatZoomDelta > 0 ?
 		            Math.ceil(floatZoomDelta) : Math.floor(floatZoomDelta)),
 
 		    zoom = map._limitZoom(oldZoom + roundZoomDelta),
 		    scale = map.getZoomScale(zoom) / this._scale;
+=======
+		    zoomDelta = this._zoom - oldZoom,
+		    finalZoom = map._limitZoom(zoomDelta > 0 ? Math.ceil(this._zoom) : Math.floor(this._zoom));
+>>>>>>> origin/pyramid
 
 		map._animateZoom(center, zoom, origin, scale);
 	},

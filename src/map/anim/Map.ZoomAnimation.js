@@ -111,6 +111,7 @@ L.Map.include(!zoomAnimated ? {} : {
 			L.Draggable._disabled = true;
 		}
 
+<<<<<<< HEAD
 		L.Util.requestAnimFrame(function () {
 			this.fire('zoomanim', {
 				center: center,
@@ -123,6 +124,15 @@ L.Map.include(!zoomAnimated ? {} : {
 			// horrible hack to work around a Chrome bug https://github.com/Leaflet/Leaflet/issues/3689
 			setTimeout(L.bind(this._onZoomTransitionEnd, this), 250);
 		}, this);
+=======
+		this.fire('zoomanim', {
+			center: center,
+			zoom: zoom,
+			scale: this.getZoomScale(zoom),
+			origin: this.latLngToLayerPoint(center),
+			offset: this._getCenterOffset(center).multiplyBy(-1)
+		});
+>>>>>>> origin/pyramid
 	},
 
 	_onZoomTransitionEnd: function () {

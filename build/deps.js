@@ -6,6 +6,7 @@ var deps = {
 		      'core/Events.js',
 		      'core/Browser.js',
 		      'geometry/Point.js',
+		      'geometry/Coordinate.js',
 		      'geometry/Bounds.js',
 		      'geometry/Transformation.js',
 		      'dom/DomUtil.js',
@@ -245,7 +246,11 @@ var deps = {
 	AnimationZoom: {
 		src: [
 			'map/anim/Map.ZoomAnimation.js',
+<<<<<<< HEAD
 			'map/anim/Map.FlyTo.js'
+=======
+			'map/anim/Map.ZoomPan.js'
+>>>>>>> origin/pyramid
 			],
 		deps: ['AnimationPan'],
 		desc: 'Smooth zooming animation. Works only on browsers that support CSS3 Transitions.'

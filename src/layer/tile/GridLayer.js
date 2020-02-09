@@ -74,6 +74,10 @@ L.GridLayer = L.Layer.extend({
 		// @option updateWhenIdle: Boolean = depends
 		// If `false`, new tiles are loaded during panning, otherwise only after it (for better performance). `true` by default on mobile browsers, otherwise `false`.
 		updateWhenIdle: L.Browser.mobile,
+<<<<<<< HEAD
+=======
+		updateInterval: 200
+>>>>>>> origin/pyramid
 
 		// @option updateWhenZooming: Boolean = true
 		// By default, a smooth zoom animation (during a [touch zoom](#map-touchzoom) or a [`flyTo()`](#map-flyto)) will update grid layers every integer zoom level. Setting this option to `false` will update the grid layer only when the smooth animation ends.
@@ -123,7 +127,15 @@ L.GridLayer = L.Layer.extend({
 		this._levels = {};
 		this._tiles = {};
 
+<<<<<<< HEAD
 		this._resetView();
+=======
+		this._levels = {};
+		this._tiles = {};
+		this._cache = {};
+
+		this._reset();
+>>>>>>> origin/pyramid
 		this._update();
 		map.on('rotateend', this._onMoveEnd, this);
 	},
@@ -133,7 +145,10 @@ L.GridLayer = L.Layer.extend({
 	},
 
 	onRemove: function (map) {
+<<<<<<< HEAD
 		this._removeAllTiles();
+=======
+>>>>>>> origin/pyramid
 		L.DomUtil.remove(this._container);
 		map._removeZoomLimit(this);
 		this._container = null;
@@ -318,11 +333,59 @@ L.GridLayer = L.Layer.extend({
 
 		if (this.options.opacity < 1) {
 			this._updateOpacity();
+<<<<<<< HEAD
+=======
 		}
 
 		this.getPane().appendChild(this._container);
 	},
 
+	_updateLevels: function () {
+		var zoom = this._tileZoom;
+
+		for (var z in this._levels) {
+			z = parseInt(z, 10);
+			if (z > zoom + 2 || z < zoom - 2) {
+				this._destroyLevel(this._levels[z]);
+				delete this._levels[z];
+			} else {
+				this._levels[z].el.style.zIndex = -Math.abs(zoom - z);
+			}
+		}
+
+		return (this._level = this._getLevel(zoom));
+	},
+
+	_getLevel: function (zoom) {
+		if (this._levels[zoom]) {
+			return this._levels[zoom];
+>>>>>>> origin/pyramid
+		}
+
+		var level = {},
+			map  = this._map;
+
+		level.el = L.DomUtil.create('div',
+			'leaflet-tile-container leaflet-zoom-animated leaflet-zoom-' + zoom, this._container);
+		level.el.style.zIndex = 0;
+
+		level.origin = map.project(map.unproject(map.getPixelOrigin()), zoom).round();
+		level.zoom = zoom;
+		level.tiles = {};
+
+		this._levels[zoom] = level;
+
+		return level;
+	},
+
+	_destroyLevel: function (level) {
+		for (var i in level.tiles) {
+			level.tiles[i].onload = null;
+		}
+		L.DomUtil.remove(level.el);
+	},
+
+<<<<<<< HEAD
 	_updateLevels: function () {
 
 		var zoom = this._tileZoom,
@@ -338,6 +401,42 @@ L.GridLayer = L.Layer.extend({
 				this._removeTilesAtZoom(z);
 				delete this._levels[z];
 			}
+=======
+	_reset: function (e) {
+		var map = this._map,
+		    zoom = map.getZoom(),
+		    tileZoom = Math.round(zoom),
+		    tileZoomChanged = this._tileZoom !== tileZoom;
+
+		if (tileZoomChanged || e && e.hard) {
+			this._tileZoom = tileZoom;
+			this._updateLevels();
+			this._resetGrid();
+		}
+
+		this._setZoomTransforms(map.getCenter(), zoom);
+	},
+
+	_setZoomTransforms: function (center, zoom) {
+		for (var i in this._levels) {
+			this._setZoomTransform(this._levels[i], center, zoom);
+		}
+	},
+
+	_setZoomTransform: function (level, center, zoom) {
+		var scale = this._map.getZoomScale(zoom, level.zoom),
+		    translate = level.origin.multiplyBy(scale)
+		        .subtract(this._map._getNewPixelOrigin(center, zoom)).round();
+
+		L.DomUtil.setTransform(level.el, translate, scale);
+	},
+
+	_clearTiles: function () {
+		for (var key in this._tiles) {
+			this.fire('tileunload', {
+				tile: this._tiles[key]
+			});
+>>>>>>> origin/pyramid
 		}
 
 		var level = this._levels[zoom],
@@ -349,6 +448,7 @@ L.GridLayer = L.Layer.extend({
 			level.el = L.DomUtil.create('div', 'leaflet-tile-container leaflet-zoom-animated', this._container);
 			level.el.style.zIndex = maxZoom;
 
+<<<<<<< HEAD
 			level.origin = map.project(map.unproject(map.getPixelOrigin()), zoom).round();
 			level.zoom = zoom;
 
@@ -397,6 +497,30 @@ L.GridLayer = L.Layer.extend({
 				this._removeTile(key);
 			}
 		}
+=======
+		this._tileContainer.innerHTML = '';
+	},
+
+	_resetGrid: function () {
+		var map = this._map,
+		    crs = map.options.crs,
+		    tileSize = this._tileSize = this._getTileSize(),
+		    tileZoom = this._tileZoom;
+
+		var bounds = this._map.getPixelWorldBounds(this._tileZoom);
+		if (bounds) {
+			this._globalTileRange = this._pxBoundsToTileRange(bounds);
+		}
+
+		this._wrapX = crs.wrapLng && [
+			Math.floor(map.project([0, crs.wrapLng[0]], tileZoom).x / tileSize),
+			Math.ceil(map.project([0, crs.wrapLng[1]], tileZoom).x / tileSize)
+		];
+		this._wrapY = crs.wrapLat && [
+			Math.floor(map.project([crs.wrapLat[0], 0], tileZoom).y / tileSize),
+			Math.ceil(map.project([crs.wrapLat[1], 0], tileZoom).y / tileSize)
+		];
+>>>>>>> origin/pyramid
 	},
 
 	_removeTilesAtZoom: function (zoom) {
@@ -408,6 +532,7 @@ L.GridLayer = L.Layer.extend({
 		}
 	},
 
+<<<<<<< HEAD
 	_removeAllTiles: function () {
 		for (var key in this._tiles) {
 			this._removeTile(key);
@@ -470,6 +595,59 @@ L.GridLayer = L.Layer.extend({
 
 				if (z + 1 < maxZoom) {
 					this._retainChildren(i, j, z + 1, maxZoom);
+=======
+	_update: function () {
+		if (!this._map) { return; }
+
+		// TODO move to reset
+		// var zoom = this._map.getZoom();
+
+		// if (zoom > this.options.maxZoom ||
+		//     zoom < this.options.minZoom) { return; }
+
+		var tileRange = this._getTileRange(this._map.getBounds(), this._tileZoom);
+
+		this._updateTiles(tileRange);
+	},
+
+	// tile coordinates range for particular geo bounds and zoom
+	_getTileRange: function (bounds, zoom) {
+		var pxBounds = new L.Bounds(
+		        this._map.project(bounds.getNorthWest(), zoom),
+		        this._map.project(bounds.getSouthEast(), zoom));
+		return this._pxBoundsToTileRange(pxBounds);
+	},
+
+	_updateTiles: function (tileRange) {
+		var queue = [],
+			queueObject = {},
+		    center = tileRange.getCenter();
+
+		var x, y, z, coord,
+			lookUp = (this.options.minZoom !== undefined ? (this.options.minZoom - this._tileZoom) : 0),
+			zoomed, zoomedKey;
+
+		// create a queue of coordinates to load tiles from
+		for (y = tileRange.min.y; y <= tileRange.max.y; y++) {
+			for (x = tileRange.min.x; x <= tileRange.max.x; x++) {
+
+				coord = new L.Coordinate(x, y, this._tileZoom);
+
+				// add tile to queue if it's not in cache or out of bounds
+				if (!(coord.toKey() in this._level.tiles) &&
+					this._isValidTile(coord)) {
+					queue.push(coord);
+					queueObject[coord.toKey()] = true;
+					for (z = -1; z > lookUp; z--) {
+						zoomed = coord.zoomBy(z).floor();
+						zoomedKey = zoomed.toKey();
+						if (zoomedKey in this._cache && !(zoomedKey in queueObject)) {
+							queueObject[zoomedKey] = true;
+							queue.push(zoomed);
+							break;
+						}
+					}
+>>>>>>> origin/pyramid
 				}
 			}
 		}
@@ -644,6 +822,7 @@ L.GridLayer = L.Layer.extend({
 			return a.distanceTo(tileCenter) - b.distanceTo(tileCenter);
 		});
 
+<<<<<<< HEAD
 		if (queue.length !== 0) {
 			// if its the first batch of tiles to load
 			if (!this._loading) {
@@ -663,10 +842,24 @@ L.GridLayer = L.Layer.extend({
 			this._level.el.appendChild(fragment);
 		}
 	},
+=======
+		var fragment, queues = {}, i;
 
-	_isValidTile: function (coords) {
-		var crs = this._map.options.crs;
+		for (i = 0; i < tilesToLoad; i++) {
+			if (!queues[queue[i].z]) { queues[queue[i].z] = []; }
+			queues[queue[i].z].push(queue[i]);
+		}
 
+		for (z in queues) {
+			// create DOM fragment to append tiles in one batch
+			fragment = document.createDocumentFragment();
+>>>>>>> origin/pyramid
+
+			for (i = 0; i < queues[z].length; i++) {
+				this._addTile(queues[z][i], fragment);
+			}
+
+<<<<<<< HEAD
 		if (!crs.infinite) {
 			// don't load tile if it's out of bounds and not wrapped
 			var bounds = this._globalTileRange;
@@ -711,13 +904,50 @@ L.GridLayer = L.Layer.extend({
 		    coords = new L.Point(+k[0], +k[1]);
 		coords.z = +k[2];
 		return coords;
+=======
+			this._getLevel(z).el.appendChild(fragment);
+		}
+
+		this._flushTiles(queueObject);
+	},
+
+	_flushTiles: function (queueObj) {
+		for (var t in this._tiles) {
+			if (!queueObj[t]) {
+				this._removeTile(t);
+			}
+		}
+	},
+
+	_isValidTile: function (coord) {
+		var crs = this._map.options.crs;
+
+		if (!crs.infinite) {
+			// don't load tile if it's out of bounds and not wrapped
+			var bounds = this._globalTileRange;
+			if ((!crs.wrapLng && (coord.x < bounds.min.x || coord.x > bounds.max.x)) ||
+			    (!crs.wrapLat && (coord.y < bounds.min.y || coord.y > bounds.max.y))) { return false; }
+		}
+
+		if (!this.options.bounds) { return true; }
+
+		// don't load tile if it doesn't intersect the bounds in options
+		return L.latLngBounds(this.options.bounds)
+			.intersects(coord.toBounds(this.map, this.options.tileSize));
+>>>>>>> origin/pyramid
 	},
 
 	_removeTile: function (key) {
 		var tile = this._tiles[key];
 		if (!tile) { return; }
 
+<<<<<<< HEAD
 		L.DomUtil.remove(tile.el);
+=======
+		if (tile.parentNode) {
+			L.DomUtil.remove(tile);
+		}
+>>>>>>> origin/pyramid
 
 		delete this._tiles[key];
 
@@ -732,9 +962,14 @@ L.GridLayer = L.Layer.extend({
 	_initTile: function (tile) {
 		L.DomUtil.addClass(tile, 'leaflet-tile');
 
+<<<<<<< HEAD
 		var tileSize = this.getTileSize();
 		tile.style.width = tileSize.x + 'px';
 		tile.style.height = tileSize.y + 'px';
+=======
+		tile.style.width = this._tileSize + 'px';
+		tile.style.height = this._tileSize + 'px';
+>>>>>>> origin/pyramid
 
 		tile.onselectstart = L.Util.falseFn;
 		tile.onmousemove = L.Util.falseFn;
@@ -751,11 +986,24 @@ L.GridLayer = L.Layer.extend({
 		}
 	},
 
+<<<<<<< HEAD
 	_addTile: function (coords, container) {
 		var tilePos = this._getTilePos(coords),
 		    key = this._tileCoordsToKey(coords);
 
 		var tile = this.createTile(this._wrapCoords(coords), L.bind(this._tileReady, this, coords));
+=======
+	_addTile: function (coord, container) {
+		var level = this._getLevel(coord.z),
+			tilePos = coord.getPos(this._tileSize, level.origin),
+		    key = coord.toKey();
+
+		// wrap tile coords if necessary (depending on CRS)
+		this._wrapCoords(coord);
+
+		var tile = this.createTile(coord, L.bind(this._tileReady, this));
+		tile.coord = coord;
+>>>>>>> origin/pyramid
 
 		this._initTile(tile);
 
@@ -769,11 +1017,17 @@ L.GridLayer = L.Layer.extend({
 		L.DomUtil.setPosition(tile, tilePos);
 
 		// save tile in cache
+<<<<<<< HEAD
 		this._tiles[key] = {
 			el: tile,
 			coords: coords,
 			current: true
 		};
+=======
+		level.tiles[key] = tile;
+
+		this._tiles[key] = tile;
+>>>>>>> origin/pyramid
 
 		container.appendChild(tile);
 		// @event tileloadstart: TileEvent
@@ -799,6 +1053,7 @@ L.GridLayer = L.Layer.extend({
 
 		var key = this._tileCoordsToKey(coords);
 
+<<<<<<< HEAD
 		tile = this._tiles[key];
 		if (!tile) { return; }
 
@@ -834,9 +1089,17 @@ L.GridLayer = L.Layer.extend({
 				// to trigger a pruning.
 				setTimeout(L.bind(this._pruneTiles, this), 250);
 			}
-		}
-	},
+=======
+		this._cache[tile.coord.toKey()] = tile;
 
+		this._tilesToLoad--;
+
+		if (this._tilesToLoad === 0) {
+			this.fire('load');
+>>>>>>> origin/pyramid
+		}
+
+<<<<<<< HEAD
 	_getTilePos: function (coords) {
 		return coords.scaleBy(this.getTileSize()).subtract(this._level.origin);
 	},
@@ -861,6 +1124,24 @@ L.GridLayer = L.Layer.extend({
 			if (!this._tiles[key].loaded) { return false; }
 		}
 		return true;
+=======
+		this._update();
+	},
+
+	_wrapCoords: function (coords) {
+		coords.x = this._wrapX ? L.Util.wrapNum(coords.x, this._wrapX) : coords.x;
+		coords.y = this._wrapY ? L.Util.wrapNum(coords.y, this._wrapY) : coords.y;
+	},
+
+	_pxBoundsToTileRange: function (bounds) {
+		return new L.Bounds(
+			bounds.min.divideBy(this._tileSize).floor(),
+			bounds.max.divideBy(this._tileSize).ceil().subtract([1, 1]));
+	},
+
+	_animateZoom: function (e) {
+		this._setZoomTransforms(e.center, e.zoom);
+>>>>>>> origin/pyramid
 	}
 });
 

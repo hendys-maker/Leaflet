@@ -23,7 +23,10 @@ module.exports = function (config) {
 			'karma-mocha',
 			'karma-coverage',
 			'karma-phantomjs-launcher',
+<<<<<<< HEAD
 			'karma-slimerjs-launcher',
+=======
+>>>>>>> origin/pyramid
 			'karma-chrome-launcher',
 			'karma-safari-launcher',
 			'karma-firefox-launcher'],
