@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: v2
 title: Tutorials
+bodyclass: examples
 ---
 
 ## Leaflet Tutorials
@@ -49,6 +50,33 @@ A case study of creating a colorful interactive [choropleth map](http://en.wikip
 
 A tutorial on how to manage groups of layers and use the layer switching control.
 
+***
+[<img src="examples/crs-simple/thumbnail.png" class="example-img bordered-img" />][9]
+
+### [Non-geographical maps][9]
+
+A primer on `L.CRS.Simple`, how to make maps with no concept of "latitude" or "longitude".
+
+
+***
+[<img src="examples/wms/thumbnail.png" class="example-img bordered-img" />][10]
+
+### [WMS and TMS][10]
+
+How to integrate with WMS and TMS services from professional GIS software.
+
+
+***
+
+The following tutorials use features available **only in Leaflet 1.0**:
+
+***
+[<img src="docs/images/labels-pane.png" class="example-img bordered-img" />][8]
+
+### [Working with map panes][8]
+
+How the default map panes work to display overlays on top of tiles, and how to override that.
+
 <!--***
 <h3><a class="noimpl" href="#">Custom Controls</a></h3>
 
@@ -70,3 +98,6 @@ If you find that an important tutorial is missing here, let us know!
  [5]: http://geojson.org/
  [6]: examples/layers-control.html
  [7]: examples/choropleth.html
+ [8]: examples/map-panes.html
+ [9]: examples/crs-simple/crs-simple.html
+ [10]: examples/wms/wms.html

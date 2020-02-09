@@ -48,7 +48,7 @@ Now putting a marker with this icon on a map is easy:
 
 ### Defining an icon class
 
-What if we need to create several icons that have lots in common? Lets define our own icon class containing the shared options, inheriting from `L.Icon`! It's really easy in Leaflet:
+What if we need to create several icons that have lots in common? Let's define our own icon class containing the shared options, inheriting from `L.Icon`! It's really easy in Leaflet:
 
 	var LeafIcon = L.Icon.extend({
 		options: {
@@ -84,7 +84,7 @@ That's it. Now take a look at the [full example](custom-icons-example.html), the
 <script>
 	var map = L.map('map').setView([51.5, -0.09], 13);
 
-	L.tileLayer(MB_URL, {attribution: MB_ATTR, id: 'examples.map-20v6611k'}).addTo(map);
+	L.tileLayer(MB_URL, {attribution: MB_ATTR, id: 'mapbox.light'}).addTo(map);
 
 	var LeafIcon = L.Icon.extend({
 		options: {
@@ -116,7 +116,7 @@ That's it. Now take a look at the [full example](custom-icons-example.html), the
 
 	var map2 = L.map('map2').setView([51.505, -0.09], 13);
 
-	L.tileLayer(MB_URL, {attribution: MB_ATTR, id: 'examples.map-20v6611k'}).addTo(map2);
+	L.tileLayer(MB_URL, {attribution: MB_ATTR, id: 'mapbox.light'}).addTo(map2);
 
 	var greenIcon2 = L.icon({
 		iconUrl: '../docs/images/leaf-green.png',
