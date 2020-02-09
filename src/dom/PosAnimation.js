@@ -56,12 +56,26 @@ L.PosAnimation = L.Evented.extend({
 		this._step();
 	},
 
+<<<<<<< HEAD
 	_step: function (round) {
 		var elapsed = (+new Date()) - this._startTime,
 		    duration = this._duration * 1000;
 
 		if (elapsed < duration) {
 			this._runFrame(this._easeOut(elapsed / duration), round);
+=======
+
+	_getPos: function () {
+		var left, top,
+		    el = this._el,
+		    style = el.style;
+
+		if (L.Browser.any3d) {
+			var transform = L.DomUtil.getTransform(el);
+			if (!transform) { return; }
+			left = transform.offset.x;
+			top  = transform.offset.y;
+>>>>>>> origin/prune2
 		} else {
 			this._runFrame(1);
 			this._complete();

@@ -86,7 +86,11 @@ L.Map.Drag = L.Handler.extend({
 	},
 
 	_onDown: function () {
+<<<<<<< HEAD
 		this._map._stop();
+=======
+		this._map.stop();
+>>>>>>> origin/prune2
 	},
 
 	_onDragStart: function () {

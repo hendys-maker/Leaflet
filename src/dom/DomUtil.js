@@ -195,6 +195,7 @@ L.DomUtil = {
 			(scale ? ' scale(' + scale + ')' : '');
 	},
 
+<<<<<<< HEAD
 	// @function setPosition(el: HTMLElement, position: Point)
 	// Sets the position of `el` to coordinates specified by `position`,
 	// using CSS translate or top/left positioning depending on the browser
@@ -213,6 +214,40 @@ L.DomUtil = {
 // 			console.log('translate3d(' + pos.x + 'px,' + pos.y + 'px' + ',0)' +
 // 				(scale ? ' scale(' + scale + ')' : '') +
 // 				' rotate(' + bearing + 'rad)');
+=======
+	// you can't easily get intermediate values of properties animated with CSS3 Transitions,
+	// we need to parse computed style (in case of transform it returns matrix string)
+
+	//Gets the offset and scale of the given element as set by setTransform
+	getTransform: function (el) {
+		//Only handles scale and translate matrices.
+		//Handling rotation is more complicated and we never set rotation
+
+		//Extract offset and scale from the matrix
+		var style = window.getComputedStyle(el),
+			split = style[L.DomUtil.TRANSFORM].split(/[\(,\)]/);
+
+		//matrix
+		if (split.length === 8) {
+			return {
+				scale: parseFloat(split[1]),
+				offset: L.point(parseFloat(split[5]), parseFloat(split[6]))
+			};
+		}
+
+		//matrix3d
+		if (split.length === 18) {
+			return {
+				scale: parseFloat(split[1]),
+				offset: L.point(parseFloat(split[13]), parseFloat(split[14]))
+			};
+		}
+
+		return null;
+	},
+
+	setPosition: function (el, point, no3d) { // (HTMLElement, Point[, Boolean])
+>>>>>>> origin/prune2
 
 			el.style[L.DomUtil.TRANSFORM] =
 				'translate3d(' + pos.x + 'px,' + pos.y + 'px' + ',0)' +
