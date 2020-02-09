@@ -613,6 +613,7 @@ L.Map = L.Class.extend({
 	_initPanes: function () {
 		var panes = this._panes = {};
 
+<<<<<<< HEAD
 		this._mapPane = panes.mapPane = this._createPane('leaflet-map-pane', this._container);
 
 <<<<<<< HEAD
@@ -635,6 +636,14 @@ L.Map = L.Class.extend({
 		this.createPane('markerPane',  this._rotatePane);
 		this.createPane('popupPane',   this._rotatePane);
 >>>>>>> origin/rotate
+=======
+		this.createPane('tilePane');
+		this.createPane('shadowPane');
+		this.createPane('overlayPane');
+		this.createPane('markerPane');
+		this.createPane('labelPane');
+		this.createPane('popupPane');
+>>>>>>> origin/label
 
 		if (!this.options.markerZoomAnimation) {
 			L.DomUtil.addClass(panes.markerPane, zoomHide);

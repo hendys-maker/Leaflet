@@ -34,15 +34,22 @@ L.Map.mergeOptions({
 	closePopupOnClick: true
 });
 
+<<<<<<< HEAD
 // @namespace Popup
 L.Popup = L.Layer.extend({
+=======
+L.Popup = L.PopupBase.extend({
+>>>>>>> origin/label
 
 	// @section
 	// @aka Popup options
 	options: {
+<<<<<<< HEAD
 		// @option maxWidth: Number = 300
 		// Max width of the popup, in pixels.
 		maxWidth: 300,
+=======
+>>>>>>> origin/label
 
 		// @option minWidth: Number = 50
 		// Min width of the popup, in pixels.
@@ -106,30 +113,22 @@ L.Popup = L.Layer.extend({
 		pane: 'popupPane'
 	},
 
-	initialize: function (options, source) {
-		L.setOptions(this, options);
+	getEvents: function () {
+		var events = L.PopupBase.prototype.getEvents.call(this);
 
-		this._source = source;
+		if ('closeOnClick' in this.options ? this.options.closeOnClick : this._map.options.closePopupOnClick) {
+			events.preclick = this._close;
+		}
+
+		if (this.options.keepInView) {
+			events.moveend = this._adjustPan;
+		}
+
+		return events;
 	},
 
 	onAdd: function (map) {
-		this._zoomAnimated = this._zoomAnimated && this.options.zoomAnimation;
-
-		if (!this._container) {
-			this._initLayout();
-		}
-
-		if (map._fadeAnimated) {
-			L.DomUtil.setOpacity(this._container, 0);
-		}
-
-		clearTimeout(this._removeTimeout);
-		this.getPane().appendChild(this._container);
-		this.update();
-
-		if (map._fadeAnimated) {
-			L.DomUtil.setOpacity(this._container, 1);
-		}
+		L.PopupBase.prototype.onAdd.call(this, map);
 
 		// @namespace Map
 		// @section Popup events
@@ -147,6 +146,7 @@ L.Popup = L.Layer.extend({
 		}
 	},
 
+<<<<<<< HEAD
 	// @namespace Popup
 	// @method openOn(map: Map): this
 	// Adds the popup to the map and closes the previous one. The same as `map.openPopup(popup)`.
@@ -155,13 +155,10 @@ L.Popup = L.Layer.extend({
 		return this;
 	},
 
+=======
+>>>>>>> origin/label
 	onRemove: function (map) {
-		if (map._fadeAnimated) {
-			L.DomUtil.setOpacity(this._container, 0);
-			this._removeTimeout = setTimeout(L.bind(L.DomUtil.remove, L.DomUtil, this._container), 200);
-		} else {
-			L.DomUtil.remove(this._container);
-		}
+		L.PopupBase.prototype.onRemove.call(this, map);
 
 		// @namespace Map
 		// @section Popup events
@@ -180,6 +177,7 @@ L.Popup = L.Layer.extend({
 		}
 	},
 
+<<<<<<< HEAD
 	// @namespace Popup
 	// @method getLatLng: LatLng
 	// Returns the geographical point of popup.
@@ -273,6 +271,10 @@ L.Popup = L.Layer.extend({
 		if (this._map) {
 			L.DomUtil.toBack(this._container);
 		}
+=======
+	openOn: function (map) {
+		map.openPopup(this);
+>>>>>>> origin/label
 		return this;
 	},
 
@@ -308,23 +310,6 @@ L.Popup = L.Layer.extend({
 		this._tip = L.DomUtil.create('div', prefix + '-tip', this._tipContainer);
 	},
 
-	_updateContent: function () {
-		if (!this._content) { return; }
-
-		var node = this._contentNode;
-		var content = (typeof this._content === 'function') ? this._content(this._source || this) : this._content;
-
-		if (typeof content === 'string') {
-			node.innerHTML = content;
-		} else {
-			while (node.hasChildNodes()) {
-				node.removeChild(node.firstChild);
-			}
-			node.appendChild(content);
-		}
-		this.fire('contentupdate');
-	},
-
 	_updateLayout: function () {
 		var container = this._contentNode,
 		    style = container.style;
@@ -353,31 +338,6 @@ L.Popup = L.Layer.extend({
 		}
 
 		this._containerWidth = this._container.offsetWidth;
-	},
-
-	_updatePosition: function () {
-		if (!this._map) { return; }
-
-		var pos = this._map.latLngToLayerPoint(this._latlng),
-		    offset = L.point(this.options.offset);
-
-		if (this._zoomAnimated) {
-			L.DomUtil.setPosition(this._container, pos);
-		} else {
-			offset = offset.add(pos);
-		}
-
-		var bottom = this._containerBottom = -offset.y,
-		    left = this._containerLeft = -Math.round(this._containerWidth / 2) + offset.x;
-
-		// bottom position the popup in case the height of the popup changes (images loading etc)
-		this._container.style.bottom = bottom + 'px';
-		this._container.style.left = left + 'px';
-	},
-
-	_animateZoom: function (e) {
-		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
-		L.DomUtil.setPosition(this._container, pos);
 	},
 
 	_adjustPan: function () {
@@ -427,7 +387,14 @@ L.Popup = L.Layer.extend({
 	_onCloseButtonClick: function (e) {
 		this._close();
 		L.DomEvent.stop(e);
+	},
+
+
+	_animateZoom: function (e) {
+		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
+		L.DomUtil.setPosition(this._container, pos);
 	}
+
 });
 
 // @namespace Popup
