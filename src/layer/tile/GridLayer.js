@@ -117,7 +117,7 @@ L.GridLayer = L.Layer.extend({
 		options = L.setOptions(this, options);
 	},
 
-	onAdd: function () {
+	onAdd: function (map) {
 		this._initContainer();
 
 		this._levels = {};
@@ -125,6 +125,7 @@ L.GridLayer = L.Layer.extend({
 
 		this._resetView();
 		this._update();
+		map.on('rotateend', this._onMoveEnd, this);
 	},
 
 	beforeAdd: function (map) {
@@ -137,6 +138,7 @@ L.GridLayer = L.Layer.extend({
 		map._removeZoomLimit(this);
 		this._container = null;
 		this._tileZoom = null;
+		map.off('rotateend', this._onMoveEnd, this);
 	},
 
 	// @method bringToFront: this
@@ -558,19 +560,40 @@ L.GridLayer = L.Layer.extend({
 	},
 
 	_onMoveEnd: function () {
+<<<<<<< HEAD
 		if (!this._map || this._map._animatingZoom) { return; }
+=======
+		if (!this._map || this._map.isRotating()) { return; }
+>>>>>>> origin/rotate
 
 		this._resetView();
 	},
 
+<<<<<<< HEAD
 	_getTiledPixelBounds: function (center) {
 		var map = this._map,
 		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
 		    scale = map.getZoomScale(mapZoom, this._tileZoom),
 		    pixelCenter = map.project(center, this._tileZoom).floor(),
 		    halfSize = map.getSize().divideBy(scale * 2);
+=======
+	_getTiledPixelBounds: function (center, zoom, tileZoom) {
+		var map = this._map;
 
-		return new L.Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize));
+		var scale = map.getZoomScale(zoom, tileZoom),
+			pixelCenter = map.project(center, tileZoom).floor(),
+// 			halfSize = map.getSize().divideBy(scale * 2);
+		    size = map.getSize(),
+// 		    halfSize = size.divideBy(scale * 2),
+		    halfPaneSize = new L.Bounds([
+		        map.containerPointToLayerPoint([0, 0]).floor(),
+		        map.containerPointToLayerPoint([size.x, 0]).floor(),
+		        map.containerPointToLayerPoint([0, size.y]).floor(),
+		        map.containerPointToLayerPoint([size.x, size.y]).floor()
+		    ]).getSize().divideBy(scale * 2);
+>>>>>>> origin/rotate
+
+		return new L.Bounds(pixelCenter.subtract(halfPaneSize), pixelCenter.add(halfPaneSize));
 	},
 
 	// Private method to load tiles in the grid's active zoom level according to map bounds
@@ -586,6 +609,10 @@ L.GridLayer = L.Layer.extend({
 		    tileRange = this._pxBoundsToTileRange(pixelBounds),
 		    tileCenter = tileRange.getCenter(),
 		    queue = [];
+
+// 		console.log('pxcenter:', pixelCenter);
+// 		console.log('px:', pixelBounds.min, pixelBounds.max);
+// 		console.log('tile:', tileRange.min, tileRange.max);
 
 		for (var key in this._tiles) {
 			this._tiles[key].current = false;

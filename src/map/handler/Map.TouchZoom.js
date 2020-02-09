@@ -3,16 +3,17 @@
  */
 
 L.Map.mergeOptions({
-	touchZoom: L.Browser.touch && !L.Browser.android23,
-	bounceAtZoomLimits: true
+	touchZoom: L.Browser.touch && !L.Browser.android23
 });
 
 L.Map.TouchZoom = L.Handler.extend({
 	addHooks: function () {
-		L.DomEvent.on(this._map._container, 'touchstart', this._onTouchStart, this);
+		this._map.touchGestures.enable();
+		this._map.touchGestures.zoom = true;
 	},
 
 	removeHooks: function () {
+<<<<<<< HEAD
 		L.DomEvent.off(this._map._container, 'touchstart', this._onTouchStart, this);
 	},
 
@@ -121,6 +122,9 @@ L.Map.TouchZoom = L.Handler.extend({
 	_getScaleOrigin: function () {
 		var centerOffset = this._centerOffset.subtract(this._delta).divideBy(this._scale);
 		return this._startCenter.add(centerOffset);
+=======
+		this._map.touchGestures.zoom = false;
+>>>>>>> origin/rotate
 	}
 });
 
