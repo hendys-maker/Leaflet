@@ -186,9 +186,19 @@ L.Draggable = L.Evented.extend({
 		this._moved = false;
 	},
 
+<<<<<<< HEAD
 	updateMapBearing: function(mapBearing) {
 		this._mapBearing = mapBearing;
 	},
+=======
+	_onDown: function (e) {
+		// Ignore simulated events, since we handle both touch and
+		// mouse explicitly; otherwise we risk getting duplicates of
+		// touch events, see #4315.
+		// Also ignore the event if disabled; this happens in IE11
+		// under some circumstances, see #3666.
+		if (e._simulated || !this._enabled) { return; }
+>>>>>>> origin/fix-ie11-disable-drag-on-click
 
 	_onDown: function (e) {
 		this._moved = false;
@@ -225,6 +235,16 @@ L.Draggable = L.Evented.extend({
 	},
 
 	_onMove: function (e) {
+<<<<<<< HEAD
+=======
+		// Ignore simulated events, since we handle both touch and
+		// mouse explicitly; otherwise we risk getting duplicates of
+		// touch events, see #4315.
+		// Also ignore the event if disabled; this happens in IE11
+		// under some circumstances, see #3666.
+		if (e._simulated || !this._enabled) { return; }
+
+>>>>>>> origin/fix-ie11-disable-drag-on-click
 		if (e.touches && e.touches.length > 1) {
 			this._moved = true;
 			return;
@@ -272,7 +292,18 @@ L.Draggable = L.Evented.extend({
 		this.fire('drag', e);
 	},
 
+<<<<<<< HEAD
 	_onUp: function () {
+=======
+	_onUp: function (e) {
+		// Ignore simulated events, since we handle both touch and
+		// mouse explicitly; otherwise we risk getting duplicates of
+		// touch events, see #4315.
+		// Also ignore the event if disabled; this happens in IE11
+		// under some circumstances, see #3666.
+		if (e._simulated || !this._enabled) { return; }
+
+>>>>>>> origin/fix-ie11-disable-drag-on-click
 		L.DomUtil.removeClass(document.body, 'leaflet-dragging');
 
 		if (this._lastTarget) {
