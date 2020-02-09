@@ -321,7 +321,7 @@ L.Map = L.Class.extend({
 			this.fire('unload');
 		}
 
-		this._initEvents('off');
+		this._initEvents(true);
 
 		try {
 			// throws error in IE6-8
@@ -752,13 +752,14 @@ L.Map = L.Class.extend({
 		}
 	},
 
-	// map events
+	// DOM event handling
 
-	_initEvents: function (onOff) {
+	_initEvents: function (remove) {
 		if (!L.DomEvent) { return; }
 
-		onOff = onOff || 'on';
+		this._targets = {};
 
+<<<<<<< HEAD
 		L.DomEvent[onOff](this._container, 'click', this._onMouseClick, this);
 
 		var events = ['dblclick', 'mousedown', 'mouseup', 'mouseenter',
@@ -768,6 +769,12 @@ L.Map = L.Class.extend({
 		for (i = 0, len = events.length; i < len; i++) {
 			L.DomEvent[onOff](this._container, events[i], this._fireMouseEvent, this);
 		}
+=======
+		var onOff = remove ? 'off' : 'on';
+
+		L.DomEvent[onOff](this._container, 'click dblclick mousedown mouseup ' +
+			'mouseover mouseout mousemove contextmenu keypress', this._handleDOMEvent, this);
+>>>>>>> origin/drag-cancel-click
 
 		if (this.options.trackResize) {
 			L.DomEvent[onOff](window, 'resize', this._onResize, this);
@@ -780,6 +787,7 @@ L.Map = L.Class.extend({
 		        function () { this.invalidateSize({debounceMoveend: true}); }, this, false, this._container);
 	},
 
+<<<<<<< HEAD
 	_onMouseClick: function (e) {
 		if (!this._loaded || (!e._simulated &&
 		        ((this.dragging && this.dragging.moved()) ||
@@ -798,11 +806,35 @@ L.Map = L.Class.extend({
 		type = (type === 'mouseenter' ? 'mouseover' : (type === 'mouseleave' ? 'mouseout' : type));
 
 		if (!this.hasEventListeners(type)) { return; }
+=======
+	_handleDOMEvent: function (e) {
+		if (!this._loaded || L.DomEvent._skipped(e)) { return; }
+
+		// find the layer the event is propagating from
+		var target = this._targets[L.stamp(e.target || e.srcElement)],
+			type = e.type === 'keypress' && e.keyCode === 13 ? 'click' : e.type;
+
+		// special case for map mouseover/mouseout events so that they're actually mouseenter/mouseleave
+		if (!target && (type === 'mouseover' || type === 'mouseout') &&
+				!L.DomEvent._checkMouse(this._container, e)) { return; }
+
+		// prevents outline when clicking on keyboard-focusable element
+		if (type === 'mousedown') {
+			L.DomUtil.preventOutline(e.target || e.srcElement);
+		}
+
+		this._fireDOMEvent(target || this, e, type);
+	},
+
+	_fireDOMEvent: function (target, e, type) {
+		if (!target.listens(type, true) && (type !== 'click' || !target.listens('preclick', true))) { return; }
+>>>>>>> origin/drag-cancel-click
 
 		if (type === 'contextmenu') {
 			L.DomEvent.preventDefault(e);
 		}
 
+<<<<<<< HEAD
 		var containerPoint = this.mouseEventToContainerPoint(e),
 		    layerPoint = this.containerPointToLayerPoint(containerPoint),
 		    latlng = this.layerPointToLatLng(layerPoint);
@@ -820,6 +852,21 @@ L.Map = L.Class.extend({
 		if (this._tileLayersNum && !this._tileLayersToLoad) {
 			this.fire('tilelayersload');
 		}
+=======
+		var data = {
+			originalEvent: e
+		};
+		if (e.type !== 'keypress') {
+			// TODO latlng isn't used, wrong latlng for markers
+			data.containerPoint = this.mouseEventToContainerPoint(e);
+			data.layerPoint = this.containerPointToLayerPoint(data.containerPoint);
+			data.latlng = this.layerPointToLatLng(data.layerPoint);
+		}
+		if (type === 'click') {
+			target.fire('preclick', data, true);
+		}
+		target.fire(type, data, true);
+>>>>>>> origin/drag-cancel-click
 	},
 
 	_clearHandlers: function () {

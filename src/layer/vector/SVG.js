@@ -100,7 +100,11 @@ L.SVG = L.Renderer.extend({
 	},
 
 	_addPath: function (layer) {
+<<<<<<< HEAD
 		this._rootGroup.appendChild(layer._path);
+=======
+		this._container.appendChild(layer._path);
+>>>>>>> origin/drag-cancel-click
 		layer.addInteractiveTarget(layer._path);
 	},
 

@@ -107,8 +107,11 @@ L.ImageOverlay = L.Layer.extend({
 		return this;
 	},
 
+<<<<<<< HEAD
 	// @method setUrl(url: String): this
 	// Changes the URL of the image.
+=======
+>>>>>>> origin/drag-cancel-click
 	setUrl: function (url) {
 		this._url = url;
 

@@ -370,6 +370,7 @@ L.DomUtil = {
 		L.DomEvent.off(window, 'dragstart', L.DomEvent.preventDefault);
 	};
 
+<<<<<<< HEAD
 	// @function preventOutline(el: HTMLElement)
 	// Makes the [outline](https://developer.mozilla.org/docs/Web/CSS/outline)
 	// of the element `el` invisible. Used internally by Leaflet to prevent
@@ -380,15 +381,21 @@ L.DomUtil = {
 			element = element.parentNode;
 		}
 		if (!element || !element.style) { return; }
+=======
+	L.DomUtil.preventOutline = function (element) {
+>>>>>>> origin/drag-cancel-click
 		L.DomUtil.restoreOutline();
 		this._outlineElement = element;
 		this._outlineStyle = element.style.outline;
 		element.style.outline = 'none';
 		L.DomEvent.on(window, 'keydown', L.DomUtil.restoreOutline, this);
 	};
+<<<<<<< HEAD
 
 	// @function restoreOutline()
 	// Cancels the effects of a previous [`L.DomUtil.preventOutline`]().
+=======
+>>>>>>> origin/drag-cancel-click
 	L.DomUtil.restoreOutline = function () {
 		if (!this._outlineElement) { return; }
 		this._outlineElement.style.outline = this._outlineStyle;
@@ -396,4 +403,19 @@ L.DomUtil = {
 		delete this._outlineStyle;
 		L.DomEvent.off(window, 'keydown', L.DomUtil.restoreOutline, this);
 	};
+<<<<<<< HEAD
+=======
+
+	// Suppress the next click, but only if it's immediate.
+	function suppressClick (e) {
+		L.DomEvent.stop(e);
+		L.DomEvent.off(window, 'click', suppressClick, null, true);
+	}
+	L.DomUtil.suppressClick = function () {
+		L.DomEvent.on(window, 'click', suppressClick, null, true);
+		setTimeout(function() {
+			L.DomEvent.off(window, 'click', suppressClick, null, true);
+		}, 0);
+	};
+>>>>>>> origin/drag-cancel-click
 })();

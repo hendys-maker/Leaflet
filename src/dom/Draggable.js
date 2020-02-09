@@ -201,6 +201,11 @@ L.Draggable = L.Evented.extend({
 		if (this._preventOutline) {
 			L.DomUtil.preventOutline(this._element);
 		}
+<<<<<<< HEAD
+=======
+
+		if (L.Draggable._disabled) { return; }
+>>>>>>> origin/drag-cancel-click
 
 		L.DomUtil.disableImageDrag();
 		L.DomUtil.disableTextSelection();
@@ -291,6 +296,8 @@ L.Draggable = L.Evented.extend({
 			this.fire('dragend', {
 				distance: this._newPos.distanceTo(this._startPos)
 			});
+
+			L.DomUtil.suppressClick();
 		}
 
 		this._moving = false;

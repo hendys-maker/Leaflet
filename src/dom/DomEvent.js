@@ -11,6 +11,7 @@ var eventsKey = '_leaflet_events';
 
 L.DomEvent = {
 
+<<<<<<< HEAD
 	// @function on(el: HTMLElement, types: String, fn: Function, context?: Object): this
 	// Adds a listener function (`fn`) to a particular DOM event type of the
 	// element `el`. You can optionally specify the context of the listener
@@ -21,6 +22,9 @@ L.DomEvent = {
 	// @function on(el: HTMLElement, eventMap: Object, context?: Object): this
 	// Adds a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
 	on: function (obj, types, fn, context) {
+=======
+	on: function (obj, types, fn, context, capture) {
+>>>>>>> origin/drag-cancel-click
 
 		if (typeof types === 'object') {
 			for (var type in types) {
@@ -30,13 +34,14 @@ L.DomEvent = {
 			types = L.Util.splitWords(types);
 
 			for (var i = 0, len = types.length; i < len; i++) {
-				this._on(obj, types[i], fn, context);
+				this._on(obj, types[i], fn, context, capture);
 			}
 		}
 
 		return this;
 	},
 
+<<<<<<< HEAD
 	// @function off(el: HTMLElement, types: String, fn: Function, context?: Object): this
 	// Removes a previously added listener function. If no function is specified,
 	// it will remove all the listeners of that particular DOM event from the element.
@@ -47,6 +52,9 @@ L.DomEvent = {
 	// @function off(el: HTMLElement, eventMap: Object, context?: Object): this
 	// Removes a set of type/listener pairs, e.g. `{click: onClick, mousemove: onMouseMove}`
 	off: function (obj, types, fn, context) {
+=======
+	off: function (obj, types, fn, context, capture) {
+>>>>>>> origin/drag-cancel-click
 
 		if (typeof types === 'object') {
 			for (var type in types) {
@@ -56,13 +64,14 @@ L.DomEvent = {
 			types = L.Util.splitWords(types);
 
 			for (var i = 0, len = types.length; i < len; i++) {
-				this._off(obj, types[i], fn, context);
+				this._off(obj, types[i], fn, context, capture);
 			}
 		}
 
 		return this;
 	},
 
+<<<<<<< HEAD
 	once: function (el, types, fn, context) {
 
 		if (typeof types === 'object') {
@@ -85,6 +94,9 @@ L.DomEvent = {
 	},
 
 	_on: function (obj, type, fn, context) {
+=======
+	_on: function (obj, type, fn, context, capture) {
+>>>>>>> origin/drag-cancel-click
 		var id = type + L.stamp(fn) + (context ? '_' + L.stamp(context) : '');
 
 		if (obj[eventsKey] && obj[eventsKey][id]) { return this; }
@@ -104,7 +116,12 @@ L.DomEvent = {
 		} else if ('addEventListener' in obj) {
 
 			if (type === 'mousewheel') {
+<<<<<<< HEAD
 				obj.addEventListener('onwheel' in obj ? 'wheel' : 'mousewheel', handler, false);
+=======
+				obj.addEventListener('DOMMouseScroll', handler, capture);
+				obj.addEventListener(type, handler, capture);
+>>>>>>> origin/drag-cancel-click
 
 			} else if ((type === 'mouseenter') || (type === 'mouseleave')) {
 				handler = function (e) {
@@ -113,7 +130,7 @@ L.DomEvent = {
 						originalHandler(e);
 					}
 				};
-				obj.addEventListener(type === 'mouseenter' ? 'mouseover' : 'mouseout', handler, false);
+				obj.addEventListener(type === 'mouseenter' ? 'mouseover' : 'mouseout', handler, capture);
 
 			} else {
 				if (type === 'click' && L.Browser.android) {
@@ -121,7 +138,7 @@ L.DomEvent = {
 						return L.DomEvent._filterClick(e, originalHandler);
 					};
 				}
-				obj.addEventListener(type, handler, false);
+				obj.addEventListener(type, handler, capture);
 			}
 
 		} else if ('attachEvent' in obj) {
@@ -134,7 +151,7 @@ L.DomEvent = {
 		return this;
 	},
 
-	_off: function (obj, type, fn, context) {
+	_off: function (obj, type, fn, context, capture) {
 
 		var id = type + L.stamp(fn) + (context ? '_' + L.stamp(context) : ''),
 		    handler = obj[eventsKey] && obj[eventsKey][id];
@@ -150,12 +167,17 @@ L.DomEvent = {
 		} else if ('removeEventListener' in obj) {
 
 			if (type === 'mousewheel') {
+<<<<<<< HEAD
 				obj.removeEventListener('onwheel' in obj ? 'wheel' : 'mousewheel', handler, false);
+=======
+				obj.removeEventListener('DOMMouseScroll', handler, capture);
+				obj.removeEventListener(type, handler, capture);
+>>>>>>> origin/drag-cancel-click
 
 			} else {
 				obj.removeEventListener(
 					type === 'mouseenter' ? 'mouseover' :
-					type === 'mouseleave' ? 'mouseout' : type, handler, false);
+					type === 'mouseleave' ? 'mouseout' : type, handler, capture);
 			}
 
 		} else if ('detachEvent' in obj) {
