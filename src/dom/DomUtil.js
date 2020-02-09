@@ -33,8 +33,19 @@ L.DomUtil = {
 		return value === 'auto' ? null : value;
 	},
 
+<<<<<<< HEAD
 	// @function create(tagName: String, className?: String, container?: HTMLElement): HTMLElement
 	// Creates an HTML element with `tagName`, sets its class to `className`, and optionally appends it to `container` element.
+=======
+	getOffset: function (el) {
+		var rect = el.getBoundingClientRect();
+
+		return new L.Point(
+			rect.left + el.clientLeft,
+			rect.top + el.clientTop);
+	},
+
+>>>>>>> origin/cache-mouse-pos
 	create: function (tagName, className, container) {
 
 		var el = document.createElement(tagName);

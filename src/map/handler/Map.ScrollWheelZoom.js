@@ -35,7 +35,12 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 =======
 		L.DomEvent.on(this._map._container, {
 			mousewheel: this._onWheelScroll,
+<<<<<<< HEAD
 			MozMousePixelScroll: this._preventScroll
+=======
+			MozMousePixelScroll: L.DomEvent.preventDefault,
+			mouseenter: this._cacheOffset
+>>>>>>> origin/cache-mouse-pos
 		}, this);
 >>>>>>> origin/scroll-prevent
 
@@ -108,6 +113,12 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 		} else {
 			map.setZoomAround(this._lastMousePos, zoom + delta);
 		}
+	},
+
+	_cacheOffset: function () {
+		var el = this._map._container;
+		// jshint camelcase: false
+		el._leaflet_offset = L.DomUtil.getOffset(el);
 	}
 });
 
