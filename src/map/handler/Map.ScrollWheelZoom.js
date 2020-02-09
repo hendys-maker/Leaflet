@@ -5,6 +5,7 @@
 // @namespace Map
 // @section Interaction Options
 L.Map.mergeOptions({
+<<<<<<< HEAD
 	// @section Mousewheel options
 	// @option scrollWheelZoom: Boolean|String = true
 	// Whether the map can be zoomed by using the mouse wheel. If passed `'center'`,
@@ -26,6 +27,9 @@ L.Map.mergeOptions({
 	wheelDebounceTime: 40,
 	scrollAtZoomLimits: false
 >>>>>>> origin/scroll-prevent
+=======
+	scrollWheelZoom: true
+>>>>>>> origin/linearzoom2
 });
 
 L.Map.ScrollWheelZoom = L.Handler.extend({
@@ -42,9 +46,12 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 			mouseenter: this._cacheOffset
 >>>>>>> origin/cache-mouse-pos
 		}, this);
+<<<<<<< HEAD
 >>>>>>> origin/scroll-prevent
 
 		this._delta = 0;
+=======
+>>>>>>> origin/linearzoom2
 	},
 
 	removeHooks: function () {
@@ -59,16 +66,25 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 	},
 
 	_onWheelScroll: function (e) {
+<<<<<<< HEAD
 		var delta = L.DomEvent.getWheelDelta(e);
 
 		var debounce = this._map.options.wheelDebounceTime;
 		this._delta += delta;
 		this._lastMousePos = this._map.mouseEventToContainerPoint(e);
+=======
+		var delta = L.DomEvent.getWheelDelta(e),
+			map = this._map,
+			mousePos = map.mouseEventToContainerPoint(e);
+>>>>>>> origin/linearzoom2
 
-		if (!this._startTime) {
-			this._startTime = +new Date();
+		if (!map._animatingZoom) {
+			this._performZoom(delta, mousePos);
+		} else {
+			map.once('moveend', L.bind(this._performZoom, this, delta, mousePos));
 		}
 
+<<<<<<< HEAD
 		var left = Math.max(debounce - (+new Date() - this._startTime), 0);
 
 		clearTimeout(this._timer);
@@ -87,31 +103,39 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 				return;
 			}
 		}
+=======
+>>>>>>> origin/linearzoom2
 		L.DomEvent.stop(e);
 	},
 
-	_performZoom: function () {
+	_performZoom: function (delta, mousePos) {
 		var map = this._map,
+<<<<<<< HEAD
 		    zoom = map.getZoom(),
 		    snap = this._map.options.zoomSnap || 0;
+=======
+		    zoom = map.getZoom();
+>>>>>>> origin/linearzoom2
 
 		map._stop(); // stop panning and fly animations if any
 
+<<<<<<< HEAD
 		// map the delta with a sigmoid function to -4..4 range leaning on -1..1
 		var d2 = this._delta / (this._map.options.wheelPxPerZoomLevel * 4),
 		    d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
 		    d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
 		    delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
-
-		this._delta = 0;
-		this._startTime = null;
+=======
+		delta = delta > 0 ? 1 : -1;
+		delta = map._limitZoom(zoom + delta) - zoom;
+>>>>>>> origin/linearzoom2
 
 		if (!delta) { return; }
 
 		if (map.options.scrollWheelZoom === 'center') {
 			map.setZoom(zoom + delta);
 		} else {
-			map.setZoomAround(this._lastMousePos, zoom + delta);
+			map.setZoomAround(mousePos, zoom + delta);
 		}
 	},
 
