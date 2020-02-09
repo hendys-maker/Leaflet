@@ -349,11 +349,95 @@ L.GridLayer = L.Layer.extend({
 		this.getPane().appendChild(this._container);
 	},
 
+	_pruneTiles: function (z) {
+		function keys(_) {
+			var l = [];
+			for (var k in _) { l.push(k); }
+			return l;
+		}
+
+		function map(_, fn) {
+			var l = [];
+			for (var i = 0; i < _.length; i++) {
+				var val = fn(_[i]);
+				if (val) { l.push(val); }
+			}
+			return l;
+		}
+
+		function zoomCoord(_) {
+			var power = Math.pow(2, this._tileZoom - z),
+				p = new L.Point(Math.floor(_.x * power), Math.floor(_.y * power));
+			p.coord = _;
+			return p;
+		}
+
+		if (!this._levels[this._tileZoom]) {
+			return false;
+		}
+
+		var nativeTiles = this._levels[this._tileZoom].tiles,
+			scaledTiles = this._levels[z].tiles,
+			scaledCoords = map(map(keys(scaledTiles), this._keyToTileCoords), L.bind(zoomCoord, this)),
+			bounds = this._getTileRange(this._map.getBounds(), this._tileZoom),
+			scaled, i, key, that = this, delay = 500;
+
+		function deferRemove(key, z) {
+			return function () {
+				var tile = that._levels[z].tiles[key];
+				L.DomUtil.remove(tile);
+				that.fire('tileunload', {tile: tile});
+				delete that._levels[z].tiles[key];
+			};
+		}
+
+		if (z < this._tileZoom) {
+			for (i = 0; i < scaledCoords.length; i++) {
+				scaled = scaledCoords[i];
+				key = this._tileCoordsToKey(scaled);
+				if ((key in nativeTiles && nativeTiles[key].complete) ||
+					!bounds.contains(scaled)) {
+
+					key = this._tileCoordsToKey(scaled.coord);
+					setTimeout(deferRemove(z, key), delay);
+
+				}
+			}
+		} else if (z > this._tileZoom) {
+			var subs = Math.pow(4, z - this._tileZoom), neededSubs = {};
+			for (i = 0; i < scaledCoords.length; i++) {
+				scaled = scaledCoords[i];
+				key = this._tileCoordsToKey(scaled);
+				if ((key in nativeTiles && nativeTiles[key].complete) ||
+					!bounds.contains(scaled)) {
+					if (typeof neededSubs[key] === 'undefined') { neededSubs[key] = subs; }
+					if (!--neededSubs[key].subs) {
+
+						key = this._tileCoordsToKey(scaled.coord);
+						setTimeout(deferRemove(z, key), delay);
+
+					}
+				}
+			}
+		}
+	},
+
 	_updateLevels: function () {
 		var zoom = this._tileZoom;
 
 		for (var z in this._levels) {
+<<<<<<< HEAD
 			this._levels[z].el.style.zIndex = -Math.abs(zoom - z);
+=======
+			z = parseInt(z, 10);
+			if (z > zoom + 2 || z < zoom - 2) {
+				this._destroyLevel(this._levels[z]);
+				delete this._levels[z];
+			} else {
+                if (z !== zoom) { this._pruneTiles(z); }
+                this._levels[z].el.style.zIndex = -Math.abs(zoom - z);
+			}
+>>>>>>> origin/prune
 		}
 
 		return (this._level = this._getLevel(zoom));
@@ -1264,7 +1348,11 @@ L.GridLayer = L.Layer.extend({
 
 		if (this._tilesToLoad === 0) {
 			this.fire('load');
+<<<<<<< HEAD
 >>>>>>> origin/pyramid
+=======
+			this._updateLevels();
+>>>>>>> origin/prune
 		}
 
 <<<<<<< HEAD
